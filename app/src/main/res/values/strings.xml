@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tracker</string>
+    <string name="app_name_full">Basic Tracker</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    
+    <string name="no_items_to_track">No items to track yet</string>
+    <string name="add_item">Add item to track</string>
+    <string name="item_name">Item name</string>
+    <string name="item_name_hint">e.g., Running, Migraine, Reading…</string>
+    
+    <string name="sentiment_positive">Positive</string>
+    <string name="sentiment_negative">Negative</string>
+    <string name="sentiment_neutral">Neutral</string>
+    
+    <string name="view_day">Day</string>
+    <string name="view_week">Week</string>
+    <string name="view_month">Month</string>
+    
+    <string name="statistics">Statistics</string>
+    <string name="all_items">All Items</string>
+    
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    
+    <string name="today">Today</string>
+    <string name="this_week">This Week</string>
+    <string name="this_month">This Month</string>
+    <string name="all_time">All Time</string>
+    
+    <string name="occurrences">occurrences</string>
+    <string name="streak">Current streak</string>
+    <string name="days">days</string>
+</resources>

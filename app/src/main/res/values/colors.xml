@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#50D650</color>
+    <color name="colorPrimaryDark">#3CB43C</color>
+    <color name="colorAccent">#50D650</color>
+    
+    <color name="frameColour">#F0FFF0</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    
+    <color name="sentiment_positive">#4CAF50</color>
+    <color name="sentiment_negative">#F44336</color>
+    <color name="sentiment_neutral">#9E9E9E</color>
+    
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+</resources>
