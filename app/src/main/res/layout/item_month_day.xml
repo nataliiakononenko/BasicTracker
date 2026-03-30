@@ -12,10 +12,7 @@
         android:orientation="vertical"
         android:gravity="center"
         android:padding="8dp"
-        android:minHeight="60dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackground">
+        android:minHeight="60dp">
 
         <TextView
             android:id="@+id/tv_day"

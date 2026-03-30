@@ -52,7 +52,8 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var drawerAdapter: DrawerItemAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
 
-    private var currentDate: Calendar = Calendar.getInstance()
+    private var currentDate: Calendar = Calendar.getInstance()  // For month navigation
+    private var selectedDate: Calendar = Calendar.getInstance()  // For selected day (green frame)
     private var selectedItemId: Long? = null
     private var defaultItemId: Long? = null
 
@@ -211,11 +212,11 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private fun setupMonthNavigation() {
         btnPrevMonth.setOnClickListener {
             currentDate.add(Calendar.MONTH, -1)
-            loadData()
+            updateDateDisplay()  // Only update calendar display, not tracking items
         }
         btnNextMonth.setOnClickListener {
             currentDate.add(Calendar.MONTH, 1)
-            loadData()
+            updateDateDisplay()  // Only update calendar display, not tracking items
         }
     }
 
@@ -297,10 +298,17 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         todayStr: String,
         isCurrentMonth: Boolean
     ) {
+        // Capture the date NOW before the calendar object gets mutated in the loop
+        val capturedTime = calendar.timeInMillis
         val dateStr = getDateString(calendar)
+        val selectedDateStr = getDateString(selectedDate)
+        val isToday = dateStr == todayStr
+        val isSelected = dateStr == selectedDateStr
+
         val dayView = LayoutInflater.from(this).inflate(R.layout.item_month_day, monthGrid, false)
         val tvDay = dayView.findViewById<TextView>(R.id.tv_day)
         val dotsContainer = dayView.findViewById<LinearLayout>(R.id.dots_container)
+        val dayContainer = dayView.findViewById<LinearLayout>(R.id.day_container)
 
         tvDay.text = day.toString()
         
@@ -310,9 +318,24 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             tvDay.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
         }
 
-        if (dateStr == todayStr) {
-            dayView.findViewById<LinearLayout>(R.id.day_container)
-                .setBackgroundResource(R.drawable.selected_day_background)
+        // Set background based on date type
+        when {
+            isToday && isSelected -> {
+                // Both today and selected: light green background + green frame
+                dayContainer.setBackgroundResource(R.drawable.selected_today_background)
+            }
+            isSelected -> {
+                // Selected date gets green frame only
+                dayContainer.setBackgroundResource(R.drawable.selected_day_background)
+            }
+            isToday -> {
+                // Today gets light green background only
+                dayContainer.setBackgroundResource(R.drawable.current_day_background)
+            }
+            else -> {
+                // Default: transparent background
+                dayContainer.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            }
         }
 
         val entries = database.getEntriesForDate(dateStr)
@@ -336,15 +359,16 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             }
         }
 
+        // Use captured time to avoid stale calendar reference
         dayView.setOnClickListener {
-            val clickedCal = calendar.clone() as Calendar
-            currentDate.time = clickedCal.time
-            loadData()
+            selectedDate.timeInMillis = capturedTime
+            setupMonthView()
+            loadTrackingItems()
         }
 
         dayView.setOnLongClickListener {
-            val clickedCal = calendar.clone() as Calendar
-            currentDate.time = clickedCal.time
+            selectedDate.timeInMillis = capturedTime
+            setupMonthView()
             showAddItemDialog()
             true
         }
@@ -373,7 +397,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         }
 
         markedItems.clear()
-        val dateStr = getDateString(currentDate)
+        val dateStr = getDateString(selectedDate)  // Use selectedDate for tracking items
         for (item in items) {
             val entry = database.getEntry(item.id, dateStr)
             if (entry != null) {
