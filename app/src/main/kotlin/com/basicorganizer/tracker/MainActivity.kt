@@ -346,8 +346,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 val item = items.find { it.id == entry.trackingItemId }
                 if (item != null) {
                     val dot = View(this)
-                    val dotParams = LinearLayout.LayoutParams(8, 8)
-                    dotParams.setMargins(2, 0, 2, 0)
+                    val dotSize = (6 * resources.displayMetrics.density).toInt()
+                    val dotMargin = (1.5 * resources.displayMetrics.density).toInt()
+                    val dotParams = LinearLayout.LayoutParams(dotSize, dotSize)
+                    dotParams.setMargins(dotMargin, 0, dotMargin, 0)
                     dot.layoutParams = dotParams
                     dot.setBackgroundResource(R.drawable.circle_indicator)
                     val color = when (item.sentiment) {

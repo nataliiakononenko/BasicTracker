@@ -82,7 +82,7 @@ class DrawerItemAdapter(
             Sentiment.NEUTRAL -> R.color.sentiment_neutral
         }
         
-        val drawable = holder.sentimentIndicator.background as? GradientDrawable
+        val drawable = holder.sentimentIndicator.background.mutate() as? GradientDrawable
         drawable?.setColor(ContextCompat.getColor(context, sentimentColor))
         
         holder.itemView.setOnClickListener {

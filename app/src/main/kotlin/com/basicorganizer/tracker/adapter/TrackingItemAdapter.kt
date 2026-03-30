@@ -1,6 +1,7 @@
 package com.basicorganizer.tracker.adapter
 
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,14 @@ class TrackingItemAdapter(
         }
         holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, bgColor))
         
+        val sentimentColor = when (item.sentiment) {
+            Sentiment.POSITIVE -> R.color.sentiment_positive
+            Sentiment.NEGATIVE -> R.color.sentiment_negative
+            Sentiment.NEUTRAL -> R.color.sentiment_neutral
+        }
+        val drawable = holder.sentimentIndicator.background.mutate() as? GradientDrawable
+        drawable?.setColor(ContextCompat.getColor(context, sentimentColor))
+        
         val isMarked = markedItems[item.id] == true
         updateCheckState(holder, isMarked)
         
@@ -76,6 +85,7 @@ class TrackingItemAdapter(
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tv_item_name)
         val itemLayout: View = itemView.findViewById(R.id.item_layout)
+        val sentimentIndicator: View = itemView.findViewById(R.id.sentiment_indicator)
         val btnCheck: ImageView = itemView.findViewById(R.id.btn_mark_check)
     }
 }
