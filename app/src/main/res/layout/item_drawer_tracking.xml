@@ -7,11 +7,13 @@
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:padding="12dp"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
     android:clickable="true"
     android:focusable="true"
-    android:background="?attr/selectableItemBackground">
+    android:background="@drawable/drawer_item_border">
 
     <View
         android:id="@+id/sentiment_indicator"
@@ -30,19 +32,20 @@
 
     <ImageView
         android:id="@+id/btn_delete"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
         android:src="@android:drawable/ic_menu_delete"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="4dp"
         app:tint="@color/sentiment_negative"
         android:contentDescription="Delete item" />
 
     <ImageView
         android:id="@+id/btn_drag_handle"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@android:drawable/ic_menu_more"
-        android:rotation="90"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_drag_handle"
         app:tint="@color/text_secondary"
         android:contentDescription="Drag to reorder" />
 
