@@ -530,7 +530,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     override fun onMarkYes(item: TrackingItem) {
-        val dateStr = getDateString(currentDate)
+        val dateStr = getDateString(selectedDate)
         val currentEntry = database.getEntry(item.id, dateStr)
         
         if (currentEntry?.occurred == true) {
@@ -542,7 +542,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     override fun onMarkNo(item: TrackingItem) {
-        val dateStr = getDateString(currentDate)
+        val dateStr = getDateString(selectedDate)
         val currentEntry = database.getEntry(item.id, dateStr)
         
         if (currentEntry?.occurred == false) {
