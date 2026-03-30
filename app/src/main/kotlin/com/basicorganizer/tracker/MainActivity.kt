@@ -369,9 +369,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         }
 
         dayView.setOnLongClickListener {
-            selectedDate.timeInMillis = capturedTime
-            setupMonthView()
-            showAddItemDialog()
+            // TODO: Long-click on calendar day - future functionality
             true
         }
 
@@ -564,7 +562,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private fun showItemOptionsDialog(item: TrackingItem) {
         val isDefault = defaultItemId == item.id
         val defaultOption = if (isDefault) "Unset as default" else "Set as default"
-        val options = arrayOf(getString(R.string.edit), defaultOption)
+        val options = arrayOf(getString(R.string.edit), defaultOption, getString(R.string.delete))
         
         AlertDialog.Builder(this)
             .setTitle(item.name)
@@ -572,6 +570,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 when (which) {
                     0 -> showAddItemDialog(item)
                     1 -> toggleDefaultItem(item)
+                    2 -> confirmDeleteItem(item)
                 }
             }
             .show()
