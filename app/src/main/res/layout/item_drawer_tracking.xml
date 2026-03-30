@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -16,7 +17,8 @@
         android:id="@+id/sentiment_indicator"
         android:layout_width="8dp"
         android:layout_height="8dp"
-        android:background="@drawable/circle_indicator" />
+        android:background="@drawable/circle_indicator"
+        android:layout_marginEnd="12dp" />
 
     <TextView
         android:id="@+id/tv_item_name"
@@ -24,14 +26,24 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textSize="16sp"
-        android:textColor="@color/text_primary"
-        android:layout_marginStart="12dp" />
+        android:textColor="@color/text_primary" />
 
-    <TextView
-        android:id="@+id/tv_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary" />
+    <ImageView
+        android:id="@+id/btn_delete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:layout_marginEnd="8dp"
+        app:tint="@color/sentiment_negative"
+        android:contentDescription="Delete item" />
+
+    <ImageView
+        android:id="@+id/btn_drag_handle"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/ic_menu_more"
+        android:rotation="90"
+        app:tint="@color/text_secondary"
+        android:contentDescription="Drag to reorder" />
 
 </LinearLayout>

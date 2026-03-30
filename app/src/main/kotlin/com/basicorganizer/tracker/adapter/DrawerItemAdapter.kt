@@ -5,6 +5,7 @@ import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +23,7 @@ class DrawerItemAdapter(
     interface OnItemClickListener {
         fun onItemClick(item: TrackingItem)
         fun onItemLongClick(item: TrackingItem)
+        fun onItemDelete(item: TrackingItem)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,7 +35,6 @@ class DrawerItemAdapter(
         val item = items[position]
         
         holder.tvName.text = item.name
-        holder.tvCount.text = "${occurrenceCounts[item.id] ?: 0}"
         
         val sentimentColor = when (item.sentiment) {
             Sentiment.POSITIVE -> R.color.sentiment_positive
@@ -52,6 +53,10 @@ class DrawerItemAdapter(
             listener.onItemLongClick(item)
             true
         }
+        
+        holder.btnDelete.setOnClickListener {
+            listener.onItemDelete(item)
+        }
     }
 
     override fun getItemCount(): Int = items.size
@@ -65,7 +70,8 @@ class DrawerItemAdapter(
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tv_item_name)
-        val tvCount: TextView = itemView.findViewById(R.id.tv_count)
         val sentimentIndicator: View = itemView.findViewById(R.id.sentiment_indicator)
+        val btnDelete: ImageView = itemView.findViewById(R.id.btn_delete)
+        val btnDragHandle: ImageView = itemView.findViewById(R.id.btn_drag_handle)
     }
 }

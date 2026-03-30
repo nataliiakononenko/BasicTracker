@@ -84,6 +84,17 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         drawerAdapter = DrawerItemAdapter(this, emptyList(), occurrenceCounts, this)
         drawerRecyclerView.adapter = drawerAdapter
 
+        navView.findViewById<View>(R.id.drawer_all_items).setOnClickListener {
+            selectedItemId = null
+            supportActionBar?.title = getString(R.string.app_name)
+            drawerLayout.closeDrawer(GravityCompat.START)
+            loadData()
+        }
+
+        navView.findViewById<FloatingActionButton>(R.id.drawer_fab_add_item).setOnClickListener {
+            showAddItemDialog()
+        }
+
         navView.findViewById<View>(R.id.drawer_statistics).setOnClickListener {
             showStatisticsDialog()
             drawerLayout.closeDrawer(GravityCompat.START)
@@ -282,7 +293,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         } else {
             emptyState.visibility = View.GONE
             rvTrackingItems.visibility = View.VISIBLE
-            fabAddItem.visibility = View.VISIBLE
+            fabAddItem.visibility = if (selectedItemId == null) View.VISIBLE else View.GONE
 
             if (!::itemAdapter.isInitialized) {
                 itemAdapter = TrackingItemAdapter(this, items, markedItems, this)
@@ -426,6 +437,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         supportActionBar?.title = item.name
         drawerLayout.closeDrawer(GravityCompat.START)
         loadData()
+    }
+
+    override fun onItemDelete(item: TrackingItem) {
+        confirmDeleteItem(item)
     }
 
     private fun showItemOptionsDialog(item: TrackingItem) {
