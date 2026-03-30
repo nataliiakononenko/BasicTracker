@@ -227,7 +227,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
     private fun updateDateDisplay() {
         val monthYearFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        tvMonthYear.text = monthYearFormat.format(currentDate.time).uppercase()
+        tvMonthYear.text = monthYearFormat.format(currentDate.time)
 
         setupWeekDayHeaders()
         setupMonthView()
