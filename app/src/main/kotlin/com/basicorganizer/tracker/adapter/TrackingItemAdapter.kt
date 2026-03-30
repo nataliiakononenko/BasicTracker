@@ -4,13 +4,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.basicorganizer.tracker.R
 import com.basicorganizer.tracker.data.Sentiment
 import com.basicorganizer.tracker.data.TrackingItem
-import com.google.android.material.button.MaterialButton
 
 class TrackingItemAdapter(
     private val context: Context,
@@ -20,8 +20,7 @@ class TrackingItemAdapter(
 ) : RecyclerView.Adapter<TrackingItemAdapter.ViewHolder>() {
 
     interface OnItemInteractionListener {
-        fun onMarkYes(item: TrackingItem)
-        fun onMarkNo(item: TrackingItem)
+        fun onToggleMark(item: TrackingItem)
         fun onItemLongClick(item: TrackingItem)
     }
 
@@ -42,15 +41,11 @@ class TrackingItemAdapter(
         }
         holder.sentimentIndicator.setBackgroundColor(ContextCompat.getColor(context, sentimentColor))
         
-        val isMarked = markedItems[item.id]
-        updateButtonStates(holder, isMarked)
+        val isMarked = markedItems[item.id] == true
+        updateCheckState(holder, isMarked)
         
-        holder.btnYes.setOnClickListener {
-            listener.onMarkYes(item)
-        }
-        
-        holder.btnNo.setOnClickListener {
-            listener.onMarkNo(item)
+        holder.btnCheck.setOnClickListener {
+            listener.onToggleMark(item)
         }
         
         holder.itemView.setOnLongClickListener {
@@ -59,37 +54,20 @@ class TrackingItemAdapter(
         }
     }
 
-    private fun updateButtonStates(holder: ViewHolder, isMarked: Boolean?) {
-        when (isMarked) {
-            true -> {
-                holder.btnYes.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                holder.btnYes.setTextColor(ContextCompat.getColor(context, R.color.white))
-                holder.btnNo.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
-                holder.btnNo.setTextColor(ContextCompat.getColor(context, R.color.sentiment_negative))
-            }
-            false -> {
-                holder.btnYes.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
-                holder.btnYes.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                holder.btnNo.setBackgroundColor(ContextCompat.getColor(context, R.color.sentiment_negative))
-                holder.btnNo.setTextColor(ContextCompat.getColor(context, R.color.white))
-            }
-            null -> {
-                holder.btnYes.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
-                holder.btnYes.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
-                holder.btnNo.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent))
-                holder.btnNo.setTextColor(ContextCompat.getColor(context, R.color.sentiment_negative))
-            }
+    private fun updateCheckState(holder: ViewHolder, isChecked: Boolean) {
+        if (isChecked) {
+            holder.btnCheck.setBackgroundResource(R.drawable.circle_checked_background)
+            holder.btnCheck.setColorFilter(ContextCompat.getColor(context, R.color.white))
+        } else {
+            holder.btnCheck.setBackgroundResource(R.drawable.check_unchecked_background)
+            holder.btnCheck.setColorFilter(ContextCompat.getColor(context, R.color.text_secondary))
         }
     }
 
     override fun getItemCount(): Int = items.size
 
-    fun updateItems(newItems: List<TrackingItem>) {
+    fun updateData(newItems: List<TrackingItem>, newMarkedItems: Map<Long, Boolean>) {
         items = newItems
-        notifyDataSetChanged()
-    }
-
-    fun updateMarkedItems(newMarkedItems: Map<Long, Boolean>) {
         markedItems.clear()
         markedItems.putAll(newMarkedItems)
         notifyDataSetChanged()
@@ -98,7 +76,6 @@ class TrackingItemAdapter(
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tv_item_name)
         val sentimentIndicator: View = itemView.findViewById(R.id.sentiment_indicator)
-        val btnYes: MaterialButton = itemView.findViewById(R.id.btn_mark_yes)
-        val btnNo: MaterialButton = itemView.findViewById(R.id.btn_mark_no)
+        val btnCheck: ImageView = itemView.findViewById(R.id.btn_mark_check)
     }
 }

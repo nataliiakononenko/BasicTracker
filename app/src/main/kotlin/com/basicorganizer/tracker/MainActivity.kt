@@ -396,14 +396,14 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             database.getAllTrackingItems()
         }
 
-        markedItems.clear()
+        val newMarkedItems = mutableMapOf<Long, Boolean>()
         val dateStr = getDateString(selectedDate)  // Use selectedDate for tracking items
         for (item in items) {
             val entry = database.getEntry(item.id, dateStr)
-            if (entry != null) {
-                markedItems[item.id] = entry.occurred
-            }
+            newMarkedItems[item.id] = entry?.occurred == true
         }
+        markedItems.clear()
+        markedItems.putAll(newMarkedItems)
 
         if (items.isEmpty()) {
             emptyState.visibility = View.VISIBLE
@@ -418,8 +418,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 itemAdapter = TrackingItemAdapter(this, items, markedItems, this)
                 rvTrackingItems.adapter = itemAdapter
             } else {
-                itemAdapter.updateItems(items)
-                itemAdapter.updateMarkedItems(markedItems)
+                itemAdapter.updateData(items, newMarkedItems)
             }
         }
     }
@@ -529,7 +528,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
     }
 
-    override fun onMarkYes(item: TrackingItem) {
+    override fun onToggleMark(item: TrackingItem) {
         val dateStr = getDateString(selectedDate)
         val currentEntry = database.getEntry(item.id, dateStr)
         
@@ -537,18 +536,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             database.deleteEntry(item.id, dateStr)
         } else {
             database.setEntry(item.id, dateStr, true)
-        }
-        loadData()
-    }
-
-    override fun onMarkNo(item: TrackingItem) {
-        val dateStr = getDateString(selectedDate)
-        val currentEntry = database.getEntry(item.id, dateStr)
-        
-        if (currentEntry?.occurred == false) {
-            database.deleteEntry(item.id, dateStr)
-        } else {
-            database.setEntry(item.id, dateStr, false)
         }
         loadData()
     }
