@@ -5,6 +5,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -81,7 +83,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 supportActionBar?.title = item.name
             }
         } else {
-            supportActionBar?.title = getString(R.string.all_items)
+            supportActionBar?.title = ""
         }
     }
 
@@ -151,7 +153,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
         navView.findViewById<View>(R.id.drawer_all_items).setOnClickListener {
             selectedItemId = null
-            supportActionBar?.title = getString(R.string.all_items)
+            supportActionBar?.title = ""
             drawerLayout.closeDrawer(GravityCompat.START)
             loadData()
         }
@@ -359,9 +361,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         // Update toolbar title based on selected item
         if (selectedItemId != null) {
             val item = database.getTrackingItem(selectedItemId!!)
-            supportActionBar?.title = item?.name ?: getString(R.string.all_items)
+            supportActionBar?.title = item?.name ?: ""
         } else {
-            supportActionBar?.title = getString(R.string.all_items)
+            supportActionBar?.title = ""
         }
         
         val items = if (selectedItemId != null) {
@@ -595,19 +597,26 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             .show()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_statistics -> {
+                // TODO: Implement statistics view
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onBackPressed() {
-        when {
-            drawerLayout.isDrawerOpen(GravityCompat.START) -> {
-                drawerLayout.closeDrawer(GravityCompat.START)
-            }
-            selectedItemId != null -> {
-                selectedItemId = null
-                supportActionBar?.title = getString(R.string.app_name)
-                loadData()
-            }
-            else -> {
-                super.onBackPressed()
-            }
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
         }
     }
 }
