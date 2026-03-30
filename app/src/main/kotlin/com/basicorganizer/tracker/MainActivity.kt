@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
     private var currentDate: Calendar = Calendar.getInstance()
     private var selectedItemId: Long? = null
+    private var defaultItemId: Long? = null
 
     private val markedItems = mutableMapOf<Long, Boolean>()
     private val occurrenceCounts = mutableMapOf<Long, Int>()
@@ -58,11 +59,24 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         setContentView(R.layout.activity_main)
 
         database = TrackerDatabase(this)
+        loadDefaultItem()
         initializeViews()
         setupToolbar()
         setupNavigationDrawer()
         setupMonthNavigation()
         loadData()
+    }
+
+    private fun loadDefaultItem() {
+        val prefs = getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE)
+        val savedDefaultId = prefs.getLong("defaultItemId", -1L)
+        if (savedDefaultId != -1L) {
+            val item = database.getTrackingItem(savedDefaultId)
+            if (item != null) {
+                defaultItemId = savedDefaultId
+                selectedItemId = savedDefaultId
+            }
+        }
     }
 
     private fun initializeViews() {
@@ -84,9 +98,17 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         drawerRecyclerView.layoutManager = LinearLayoutManager(this)
 
         drawerAdapter = DrawerItemAdapter(this, mutableListOf(), occurrenceCounts, this)
+        drawerAdapter.setDatabase(database)
         drawerRecyclerView.adapter = drawerAdapter
 
-        val callback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+        val callback = object : ItemTouchHelper.SimpleCallback(0, 0) {
+            private var dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            
+            override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+                // Only allow drag if explicitly started via handle
+                return makeMovementFlags(dragFlags, 0)
+            }
+            
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -112,11 +134,8 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 super.clearView(recyclerView, viewHolder)
                 viewHolder.itemView.alpha = 1.0f
-                val items = database.getAllTrackingItems()
-                for (i in items.indices) {
-                    items[i].position = i
-                    database.updateTrackingItem(items[i])
-                }
+                // Save the new order from the adapter
+                drawerAdapter.saveItemPositions()
             }
         }
 
@@ -352,6 +371,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             occurrenceCounts[item.id] = database.countOccurrencesForItem(item.id)
         }
         drawerAdapter.updateItems(items, occurrenceCounts)
+        drawerAdapter.setDefaultItemId(defaultItemId)
     }
 
     private fun showAddItemDialog(editItem: TrackingItem? = null) {
@@ -488,16 +508,35 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun showItemOptionsDialog(item: TrackingItem) {
-        val options = arrayOf(getString(R.string.edit), getString(R.string.delete))
+        val isDefault = defaultItemId == item.id
+        val defaultOption = if (isDefault) "Unset as default" else "Set as default"
+        val options = arrayOf(getString(R.string.edit), defaultOption)
+        
         AlertDialog.Builder(this)
             .setTitle(item.name)
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> showAddItemDialog(item)
-                    1 -> confirmDeleteItem(item)
+                    1 -> toggleDefaultItem(item)
                 }
             }
             .show()
+    }
+
+    private fun toggleDefaultItem(item: TrackingItem) {
+        val prefs = getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE)
+        if (defaultItemId == item.id) {
+            // Unset as default
+            defaultItemId = null
+            prefs.edit().remove("defaultItemId").apply()
+            Toast.makeText(this, "Default view unset", Toast.LENGTH_SHORT).show()
+        } else {
+            // Set as default
+            defaultItemId = item.id
+            prefs.edit().putLong("defaultItemId", item.id).apply()
+            Toast.makeText(this, "\"${item.name}\" set as default view", Toast.LENGTH_SHORT).show()
+        }
+        drawerAdapter.setDefaultItemId(defaultItemId)
     }
 
     private fun confirmDeleteItem(item: TrackingItem) {

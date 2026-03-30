@@ -21,8 +21,29 @@ class DrawerItemAdapter(
     private var itemTouchHelper: androidx.recyclerview.widget.ItemTouchHelper? = null
 ) : RecyclerView.Adapter<DrawerItemAdapter.ViewHolder>() {
 
+    private var defaultItemId: Long? = null
+    private var database: com.basicorganizer.tracker.data.TrackerDatabase? = null
+
+    fun setDatabase(db: com.basicorganizer.tracker.data.TrackerDatabase) {
+        database = db
+    }
+
     fun setItemTouchHelper(helper: androidx.recyclerview.widget.ItemTouchHelper) {
         itemTouchHelper = helper
+    }
+
+    fun setDefaultItemId(itemId: Long?) {
+        defaultItemId = itemId
+        notifyDataSetChanged()
+    }
+
+    fun saveItemPositions() {
+        database?.let { db ->
+            for (i in items.indices) {
+                items[i].position = i
+                db.updateTrackingItem(items[i])
+            }
+        }
     }
 
     interface OnItemClickListener {
@@ -47,6 +68,13 @@ class DrawerItemAdapter(
         val item = items[position]
         
         holder.tvName.text = item.name
+        
+        // Set background color for default item
+        if (item.id == defaultItemId) {
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.default_item_background))
+        } else {
+            holder.itemView.setBackgroundResource(R.drawable.drawer_item_border)
+        }
         
         val sentimentColor = when (item.sentiment) {
             Sentiment.POSITIVE -> R.color.sentiment_positive
