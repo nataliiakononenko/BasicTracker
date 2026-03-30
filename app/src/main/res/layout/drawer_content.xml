@@ -58,7 +58,7 @@
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/drawer_statistics"
+        android:id="@+id/settings_tips"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -71,13 +71,65 @@
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_statistics"
+            android:src="@drawable/ic_tips"
             app:tint="@color/text_secondary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/statistics"
+            android:text="Tips"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/settings_report_bug"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_bug"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Report a bug"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginStart="16dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/settings_more_apps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_star"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Organized!"
             android:textSize="16sp"
             android:textColor="@color/text_primary"
             android:layout_marginStart="16dp" />

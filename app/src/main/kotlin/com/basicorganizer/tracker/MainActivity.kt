@@ -1,6 +1,9 @@
 package com.basicorganizer.tracker
 
 import android.os.Bundle
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -154,8 +157,28 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             showAddItemDialog()
         }
 
-        navView.findViewById<View>(R.id.drawer_statistics).setOnClickListener {
-            showStatisticsDialog()
+        navView.findViewById<View>(R.id.settings_tips).setOnClickListener {
+            showTipsDialog()
+            drawerLayout.closeDrawer(GravityCompat.START)
+        }
+
+        navView.findViewById<View>(R.id.settings_report_bug).setOnClickListener {
+            val intent = Intent(Intent.ACTION_SENDTO)
+            intent.data = Uri.parse("mailto:basicorganizer.post@gmail.com?subject=" + Uri.encode("Basic Tracker App"))
+            try {
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show()
+            }
+            drawerLayout.closeDrawer(GravityCompat.START)
+        }
+
+        navView.findViewById<View>(R.id.settings_more_apps).setOnClickListener {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://dev?id=BasicOrganizer")))
+            } catch (e: android.content.ActivityNotFoundException) {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/developer?id=BasicOrganizer")))
+            }
             drawerLayout.closeDrawer(GravityCompat.START)
         }
 
@@ -430,6 +453,11 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             }, 100)
         }
         dialog.show()
+    }
+
+    private fun showTipsDialog() {
+        // TODO: Implement tips dialog showing how to use the app
+        Toast.makeText(this, "Tips coming soon!", Toast.LENGTH_SHORT).show()
     }
 
     private fun showStatisticsDialog() {
