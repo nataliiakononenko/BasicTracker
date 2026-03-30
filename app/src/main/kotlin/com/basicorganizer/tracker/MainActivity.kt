@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var rvTrackingItems: RecyclerView
+    private lateinit var trackingScrollView: View
     private lateinit var emptyState: View
     private lateinit var fabAddItem: FloatingActionButton
     private lateinit var tvMonthYear: TextView
@@ -92,6 +93,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         drawerLayout = findViewById(R.id.drawer_layout)
         toolbar = findViewById(R.id.toolbar)
         rvTrackingItems = findViewById(R.id.rv_tracking_items)
+        trackingScrollView = findViewById(R.id.tracking_scroll_view)
         emptyState = findViewById(R.id.empty_state)
         fabAddItem = findViewById(R.id.fab_add_item)
         tvMonthYear = findViewById(R.id.tv_month_year)
@@ -407,11 +409,11 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
         if (items.isEmpty()) {
             emptyState.visibility = View.VISIBLE
-            rvTrackingItems.visibility = View.GONE
+            trackingScrollView.visibility = View.GONE
             fabAddItem.visibility = View.GONE
         } else {
             emptyState.visibility = View.GONE
-            rvTrackingItems.visibility = View.VISIBLE
+            trackingScrollView.visibility = View.VISIBLE
             fabAddItem.visibility = if (selectedItemId == null) View.VISIBLE else View.GONE
 
             if (!::itemAdapter.isInitialized) {
