@@ -15,15 +15,27 @@ import com.basicorganizer.tracker.data.TrackingItem
 
 class DrawerItemAdapter(
     private val context: Context,
-    private var items: List<TrackingItem>,
+    private var items: MutableList<TrackingItem>,
     private val occurrenceCounts: MutableMap<Long, Int>,
-    private val listener: OnItemClickListener
+    private val listener: OnItemClickListener,
+    private var itemTouchHelper: androidx.recyclerview.widget.ItemTouchHelper? = null
 ) : RecyclerView.Adapter<DrawerItemAdapter.ViewHolder>() {
+
+    fun setItemTouchHelper(helper: androidx.recyclerview.widget.ItemTouchHelper) {
+        itemTouchHelper = helper
+    }
 
     interface OnItemClickListener {
         fun onItemClick(item: TrackingItem)
         fun onItemLongClick(item: TrackingItem)
         fun onItemDelete(item: TrackingItem)
+        fun onItemMoved(fromPosition: Int, toPosition: Int)
+    }
+
+    fun onItemMove(fromPosition: Int, toPosition: Int) {
+        val item = items.removeAt(fromPosition)
+        items.add(toPosition, item)
+        notifyItemMoved(fromPosition, toPosition)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,12 +69,19 @@ class DrawerItemAdapter(
         holder.btnDelete.setOnClickListener {
             listener.onItemDelete(item)
         }
+
+        holder.btnDragHandle.setOnTouchListener { _, event ->
+            if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
+                itemTouchHelper?.startDrag(holder)
+            }
+            false
+        }
     }
 
     override fun getItemCount(): Int = items.size
 
     fun updateItems(newItems: List<TrackingItem>, newCounts: Map<Long, Int>) {
-        items = newItems
+        items = newItems.toMutableList()
         occurrenceCounts.clear()
         occurrenceCounts.putAll(newCounts)
         notifyDataSetChanged()

@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.basicorganizer.tracker.adapter.DrawerItemAdapter
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var database: TrackerDatabase
     private lateinit var itemAdapter: TrackingItemAdapter
     private lateinit var drawerAdapter: DrawerItemAdapter
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     private var currentDate: Calendar = Calendar.getInstance()
     private var selectedItemId: Long? = null
@@ -81,8 +83,46 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val drawerRecyclerView = navView.findViewById<RecyclerView>(R.id.rv_drawer_items)
         drawerRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        drawerAdapter = DrawerItemAdapter(this, emptyList(), occurrenceCounts, this)
+        drawerAdapter = DrawerItemAdapter(this, mutableListOf(), occurrenceCounts, this)
         drawerRecyclerView.adapter = drawerAdapter
+
+        val callback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                val fromPosition = viewHolder.adapterPosition
+                val toPosition = target.adapterPosition
+                drawerAdapter.onItemMove(fromPosition, toPosition)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // Not used
+            }
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    viewHolder?.itemView?.alpha = 0.5f
+                }
+            }
+
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                viewHolder.itemView.alpha = 1.0f
+                val items = database.getAllTrackingItems()
+                for (i in items.indices) {
+                    items[i].position = i
+                    database.updateTrackingItem(items[i])
+                }
+            }
+        }
+
+        itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(drawerRecyclerView)
+        drawerAdapter.setItemTouchHelper(itemTouchHelper)
 
         navView.findViewById<View>(R.id.drawer_all_items).setOnClickListener {
             selectedItemId = null
@@ -441,6 +481,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
     override fun onItemDelete(item: TrackingItem) {
         confirmDeleteItem(item)
+    }
+
+    override fun onItemMoved(fromPosition: Int, toPosition: Int) {
+        // Position updates are handled in ItemTouchHelper's clearView
     }
 
     private fun showItemOptionsDialog(item: TrackingItem) {
