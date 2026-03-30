@@ -23,7 +23,6 @@ import com.basicorganizer.tracker.adapter.TrackingItemAdapter
 import com.basicorganizer.tracker.data.Sentiment
 import com.basicorganizer.tracker.data.TrackerDatabase
 import com.basicorganizer.tracker.data.TrackingItem
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import java.text.SimpleDateFormat
@@ -36,11 +35,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var rvTrackingItems: RecyclerView
     private lateinit var emptyState: View
     private lateinit var fabAddItem: FloatingActionButton
-    private lateinit var tvDayName: TextView
-    private lateinit var tvDate: TextView
-    private lateinit var btnDayView: MaterialButton
-    private lateinit var btnWeekView: MaterialButton
-    private lateinit var btnMonthView: MaterialButton
+    private lateinit var tvMonthYear: TextView
+    private lateinit var btnPrevMonth: android.widget.ImageButton
+    private lateinit var btnNextMonth: android.widget.ImageButton
     private lateinit var weekHeader: LinearLayout
     private lateinit var monthViewContainer: View
 
@@ -49,13 +46,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var drawerAdapter: DrawerItemAdapter
 
     private var currentDate: Calendar = Calendar.getInstance()
-    private var currentViewMode: ViewMode = ViewMode.DAY
     private var selectedItemId: Long? = null
 
     private val markedItems = mutableMapOf<Long, Boolean>()
     private val occurrenceCounts = mutableMapOf<Long, Int>()
-
-    enum class ViewMode { DAY, WEEK, MONTH }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +59,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         initializeViews()
         setupToolbar()
         setupNavigationDrawer()
-        setupViewSwitcher()
+        setupMonthNavigation()
         loadData()
     }
 
@@ -75,11 +69,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         rvTrackingItems = findViewById(R.id.rv_tracking_items)
         emptyState = findViewById(R.id.empty_state)
         fabAddItem = findViewById(R.id.fab_add_item)
-        tvDayName = findViewById(R.id.tv_day_name)
-        tvDate = findViewById(R.id.tv_date)
-        btnDayView = findViewById(R.id.btn_day_view)
-        btnWeekView = findViewById(R.id.btn_week_view)
-        btnMonthView = findViewById(R.id.btn_month_view)
+        tvMonthYear = findViewById(R.id.tv_month_year)
+        btnPrevMonth = findViewById(R.id.btn_prev_month)
+        btnNextMonth = findViewById(R.id.btn_next_month)
         weekHeader = findViewById(R.id.week_header)
         monthViewContainer = findViewById(R.id.month_view_container)
 
@@ -98,7 +90,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         }
 
         fabAddItem.setOnClickListener { showAddItemDialog() }
-        findViewById<MaterialButton>(R.id.btn_add_item_empty).setOnClickListener { showAddItemDialog() }
+        findViewById<View>(R.id.btn_add_item_empty).setOnClickListener { showAddItemDialog() }
     }
 
     private fun setupToolbar() {
@@ -118,36 +110,15 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         toggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.white)
     }
 
-    private fun setupViewSwitcher() {
-        btnDayView.setOnClickListener { switchToView(ViewMode.DAY) }
-        btnWeekView.setOnClickListener { switchToView(ViewMode.WEEK) }
-        btnMonthView.setOnClickListener { switchToView(ViewMode.MONTH) }
-        updateViewButtons()
-    }
-
-    private fun switchToView(mode: ViewMode) {
-        currentViewMode = mode
-        updateViewButtons()
-        loadData()
-    }
-
-    private fun updateViewButtons() {
-        val selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
-        val defaultColor = ContextCompat.getColor(this, R.color.text_secondary)
-
-        btnDayView.setTextColor(if (currentViewMode == ViewMode.DAY) selectedColor else defaultColor)
-        btnWeekView.setTextColor(if (currentViewMode == ViewMode.WEEK) selectedColor else defaultColor)
-        btnMonthView.setTextColor(if (currentViewMode == ViewMode.MONTH) selectedColor else defaultColor)
-
-        btnDayView.strokeColor = android.content.res.ColorStateList.valueOf(
-            if (currentViewMode == ViewMode.DAY) selectedColor else defaultColor
-        )
-        btnWeekView.strokeColor = android.content.res.ColorStateList.valueOf(
-            if (currentViewMode == ViewMode.WEEK) selectedColor else defaultColor
-        )
-        btnMonthView.strokeColor = android.content.res.ColorStateList.valueOf(
-            if (currentViewMode == ViewMode.MONTH) selectedColor else defaultColor
-        )
+    private fun setupMonthNavigation() {
+        btnPrevMonth.setOnClickListener {
+            currentDate.add(Calendar.MONTH, -1)
+            loadData()
+        }
+        btnNextMonth.setOnClickListener {
+            currentDate.add(Calendar.MONTH, 1)
+            loadData()
+        }
     }
 
     private fun loadData() {
@@ -157,65 +128,26 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun updateDateDisplay() {
-        val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-        val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
+        val monthYearFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+        tvMonthYear.text = monthYearFormat.format(currentDate.time).uppercase()
 
-        tvDayName.text = dayFormat.format(currentDate.time)
-        tvDate.text = dateFormat.format(currentDate.time)
-
-        when (currentViewMode) {
-            ViewMode.DAY -> {
-                weekHeader.visibility = View.GONE
-                monthViewContainer.visibility = View.GONE
-                rvTrackingItems.visibility = View.VISIBLE
-            }
-            ViewMode.WEEK -> {
-                setupWeekHeader()
-                weekHeader.visibility = View.VISIBLE
-                monthViewContainer.visibility = View.GONE
-                rvTrackingItems.visibility = View.VISIBLE
-            }
-            ViewMode.MONTH -> {
-                weekHeader.visibility = View.GONE
-                monthViewContainer.visibility = View.VISIBLE
-                rvTrackingItems.visibility = View.GONE
-                setupMonthView()
-            }
-        }
+        setupWeekDayHeaders()
+        setupMonthView()
     }
 
-    private fun setupWeekHeader() {
+    private fun setupWeekDayHeaders() {
         weekHeader.removeAllViews()
-        val calendar = currentDate.clone() as Calendar
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+        val daysOfWeek = arrayOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
 
-        val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
-        val dateFormat = SimpleDateFormat("d", Locale.getDefault())
-        val currentDateStr = getDateString(currentDate)
-
-        for (i in 0..6) {
-            val dayView = LayoutInflater.from(this).inflate(R.layout.item_week_day, weekHeader, false)
-            val tvDayShort = dayView.findViewById<TextView>(R.id.tv_day_short)
-            val tvDayNum = dayView.findViewById<TextView>(R.id.tv_day_num)
-
-            tvDayShort.text = dayFormat.format(calendar.time)
-            tvDayNum.text = dateFormat.format(calendar.time)
-
-            val dateStr = getDateString(calendar)
-            if (dateStr == currentDateStr) {
-                dayView.setBackgroundResource(R.drawable.selected_day_background)
-            }
-
-            dayView.setOnClickListener {
-                currentDate.time = calendar.time
-                loadData()
-            }
-
+        for (day in daysOfWeek) {
+            val textView = TextView(this)
+            textView.text = day
+            textView.gravity = android.view.Gravity.CENTER
+            textView.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
+            textView.textSize = 12f
             val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-            dayView.layoutParams = params
-            weekHeader.addView(dayView)
-
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
+            textView.layoutParams = params
+            weekHeader.addView(textView)
         }
     }
 
@@ -227,74 +159,104 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         calendar.set(Calendar.DAY_OF_MONTH, 1)
 
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1
+        var firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY
+        if (firstDayOfWeek < 0) firstDayOfWeek += 7
 
         val items = database.getAllTrackingItems()
-        val currentDateStr = getDateString(currentDate)
+        val todayStr = getDateString(Calendar.getInstance())
+
+        val prevMonthCal = currentDate.clone() as Calendar
+        prevMonthCal.add(Calendar.MONTH, -1)
+        val daysInPrevMonth = prevMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH)
 
         for (i in 0 until firstDayOfWeek) {
-            val emptyView = View(this)
-            val params = android.widget.GridLayout.LayoutParams()
-            params.width = 0
-            params.height = 100
-            params.columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
-            emptyView.layoutParams = params
-            monthGrid.addView(emptyView)
+            val day = daysInPrevMonth - firstDayOfWeek + i + 1
+            prevMonthCal.set(Calendar.DAY_OF_MONTH, day)
+            addDayView(monthGrid, day, prevMonthCal, items, todayStr, false)
         }
 
         for (day in 1..daysInMonth) {
             calendar.set(Calendar.DAY_OF_MONTH, day)
-            val dateStr = getDateString(calendar)
+            addDayView(monthGrid, day, calendar, items, todayStr, true)
+        }
 
-            val dayView = LayoutInflater.from(this).inflate(R.layout.item_month_day, monthGrid, false)
-            val tvDay = dayView.findViewById<TextView>(R.id.tv_day)
-            val dotsContainer = dayView.findViewById<LinearLayout>(R.id.dots_container)
+        val nextMonthCal = currentDate.clone() as Calendar
+        nextMonthCal.add(Calendar.MONTH, 1)
+        val totalCells = firstDayOfWeek + daysInMonth
+        val remainingCells = if (totalCells % 7 == 0) 0 else 7 - (totalCells % 7)
+        
+        for (day in 1..remainingCells) {
+            nextMonthCal.set(Calendar.DAY_OF_MONTH, day)
+            addDayView(monthGrid, day, nextMonthCal, items, todayStr, false)
+        }
+    }
 
-            tvDay.text = day.toString()
+    private fun addDayView(
+        monthGrid: android.widget.GridLayout,
+        day: Int,
+        calendar: Calendar,
+        items: List<TrackingItem>,
+        todayStr: String,
+        isCurrentMonth: Boolean
+    ) {
+        val dateStr = getDateString(calendar)
+        val dayView = LayoutInflater.from(this).inflate(R.layout.item_month_day, monthGrid, false)
+        val tvDay = dayView.findViewById<TextView>(R.id.tv_day)
+        val dotsContainer = dayView.findViewById<LinearLayout>(R.id.dots_container)
 
-            if (dateStr == currentDateStr) {
-                dayView.setBackgroundResource(R.drawable.selected_day_background)
-            }
+        tvDay.text = day.toString()
+        
+        if (!isCurrentMonth) {
+            tvDay.setTextColor(ContextCompat.getColor(this, R.color.text_other_month))
+        } else {
+            tvDay.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
+        }
 
-            val entries = database.getEntriesForDate(dateStr)
-            for (entry in entries.take(4)) {
-                if (entry.occurred) {
-                    val item = items.find { it.id == entry.trackingItemId }
-                    if (item != null) {
-                        val dot = View(this)
-                        val dotParams = LinearLayout.LayoutParams(8, 8)
-                        dotParams.setMargins(2, 0, 2, 0)
-                        dot.layoutParams = dotParams
-                        dot.setBackgroundResource(R.drawable.circle_indicator)
-                        val color = when (item.sentiment) {
-                            Sentiment.POSITIVE -> R.color.sentiment_positive
-                            Sentiment.NEGATIVE -> R.color.sentiment_negative
-                            Sentiment.NEUTRAL -> R.color.sentiment_neutral
-                        }
-                        dot.background.setTint(ContextCompat.getColor(this, color))
-                        dotsContainer.addView(dot)
+        if (dateStr == todayStr) {
+            dayView.findViewById<LinearLayout>(R.id.day_container)
+                .setBackgroundResource(R.drawable.selected_day_background)
+        }
+
+        val entries = database.getEntriesForDate(dateStr)
+        for (entry in entries.take(4)) {
+            if (entry.occurred) {
+                val item = items.find { it.id == entry.trackingItemId }
+                if (item != null) {
+                    val dot = View(this)
+                    val dotParams = LinearLayout.LayoutParams(8, 8)
+                    dotParams.setMargins(2, 0, 2, 0)
+                    dot.layoutParams = dotParams
+                    dot.setBackgroundResource(R.drawable.circle_indicator)
+                    val color = when (item.sentiment) {
+                        Sentiment.POSITIVE -> R.color.sentiment_positive
+                        Sentiment.NEGATIVE -> R.color.sentiment_negative
+                        Sentiment.NEUTRAL -> R.color.sentiment_neutral
                     }
+                    dot.background.setTint(ContextCompat.getColor(this, color))
+                    dotsContainer.addView(dot)
                 }
             }
-
-            dayView.setOnClickListener {
-                currentDate.set(Calendar.DAY_OF_MONTH, day)
-                switchToView(ViewMode.DAY)
-            }
-
-            dayView.setOnLongClickListener {
-                currentDate.set(Calendar.DAY_OF_MONTH, day)
-                showAddItemDialog()
-                true
-            }
-
-            val params = android.widget.GridLayout.LayoutParams()
-            params.width = 0
-            params.height = android.widget.GridLayout.LayoutParams.WRAP_CONTENT
-            params.columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
-            dayView.layoutParams = params
-            monthGrid.addView(dayView)
         }
+
+        dayView.setOnClickListener {
+            val clickedCal = calendar.clone() as Calendar
+            currentDate.time = clickedCal.time
+            loadData()
+        }
+
+        dayView.setOnLongClickListener {
+            val clickedCal = calendar.clone() as Calendar
+            currentDate.time = clickedCal.time
+            showAddItemDialog()
+            true
+        }
+
+        val params = android.widget.GridLayout.LayoutParams()
+        params.width = 0
+        params.height = android.widget.GridLayout.LayoutParams.WRAP_CONTENT
+        params.columnSpec = android.widget.GridLayout.spec(android.widget.GridLayout.UNDEFINED, 1f)
+        dayView.layoutParams = params
+        monthGrid.addView(dayView)
     }
 
     private fun loadTrackingItems() {
@@ -319,7 +281,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             fabAddItem.visibility = View.GONE
         } else {
             emptyState.visibility = View.GONE
-            rvTrackingItems.visibility = if (currentViewMode != ViewMode.MONTH) View.VISIBLE else View.GONE
+            rvTrackingItems.visibility = View.VISIBLE
             fabAddItem.visibility = View.VISIBLE
 
             if (!::itemAdapter.isInitialized) {
