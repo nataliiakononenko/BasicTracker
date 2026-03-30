@@ -371,7 +371,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         }
 
         dayView.setOnLongClickListener {
-            // TODO: Long-click on calendar day - future functionality
+            selectedDate.timeInMillis = capturedTime
+            setupMonthView()
+            showDayMarkDialog()
             true
         }
 
@@ -491,6 +493,43 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             }, 100)
         }
         dialog.show()
+    }
+
+    private fun showDayMarkDialog() {
+        val items = database.getAllTrackingItems()
+        if (items.isEmpty()) {
+            showAddItemDialog()
+            return
+        }
+
+        val dateStr = getDateString(selectedDate)
+        val dateFormat = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+        val displayDate = dateFormat.format(selectedDate.time)
+
+        val itemNames = items.map { it.name }.toTypedArray()
+        val checkedStates = items.map { item ->
+            val entry = database.getEntry(item.id, dateStr)
+            entry?.occurred == true
+        }.toBooleanArray()
+
+        AlertDialog.Builder(this, R.style.GrayCheckboxDialog)
+            .setTitle(displayDate)
+            .setMultiChoiceItems(itemNames, checkedStates) { _, which, isChecked ->
+                val item = items[which]
+                if (isChecked) {
+                    database.setEntry(item.id, dateStr, true)
+                } else {
+                    database.deleteEntry(item.id, dateStr)
+                }
+            }
+            .setPositiveButton("OK") { _, _ ->
+                loadData()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .setOnDismissListener {
+                loadData()
+            }
+            .show()
     }
 
     private fun showTipsDialog() {
