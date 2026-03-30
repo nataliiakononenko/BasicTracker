@@ -78,7 +78,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             if (item != null) {
                 defaultItemId = savedDefaultId
                 selectedItemId = savedDefaultId
+                supportActionBar?.title = item.name
             }
+        } else {
+            supportActionBar?.title = getString(R.string.all_items)
         }
     }
 
@@ -148,7 +151,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
         navView.findViewById<View>(R.id.drawer_all_items).setOnClickListener {
             selectedItemId = null
-            supportActionBar?.title = getString(R.string.app_name)
+            supportActionBar?.title = getString(R.string.all_items)
             drawerLayout.closeDrawer(GravityCompat.START)
             loadData()
         }
@@ -353,6 +356,14 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun loadTrackingItems() {
+        // Update toolbar title based on selected item
+        if (selectedItemId != null) {
+            val item = database.getTrackingItem(selectedItemId!!)
+            supportActionBar?.title = item?.name ?: getString(R.string.all_items)
+        } else {
+            supportActionBar?.title = getString(R.string.all_items)
+        }
+        
         val items = if (selectedItemId != null) {
             listOfNotNull(database.getTrackingItem(selectedItemId!!))
         } else {
