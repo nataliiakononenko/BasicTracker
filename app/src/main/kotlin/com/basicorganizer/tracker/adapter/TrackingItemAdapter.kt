@@ -34,12 +34,12 @@ class TrackingItemAdapter(
         
         holder.tvName.text = item.name
         
-        val sentimentColor = when (item.sentiment) {
-            Sentiment.POSITIVE -> R.color.sentiment_positive
-            Sentiment.NEGATIVE -> R.color.sentiment_negative
-            Sentiment.NEUTRAL -> R.color.sentiment_neutral
+        val bgColor = when (item.sentiment) {
+            Sentiment.POSITIVE -> R.color.sentiment_positive_light
+            Sentiment.NEGATIVE -> R.color.sentiment_negative_light
+            Sentiment.NEUTRAL -> R.color.sentiment_neutral_light
         }
-        holder.sentimentIndicator.setBackgroundColor(ContextCompat.getColor(context, sentimentColor))
+        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, bgColor))
         
         val isMarked = markedItems[item.id] == true
         updateCheckState(holder, isMarked)
@@ -75,7 +75,7 @@ class TrackingItemAdapter(
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tv_item_name)
-        val sentimentIndicator: View = itemView.findViewById(R.id.sentiment_indicator)
+        val itemLayout: View = itemView.findViewById(R.id.item_layout)
         val btnCheck: ImageView = itemView.findViewById(R.id.btn_mark_check)
     }
 }

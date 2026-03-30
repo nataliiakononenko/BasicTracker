@@ -17,4 +17,7 @@
     <color name="text_other_month">#BDBDBD</color>
     <color name="calendar_grid">#E0E0E0</color>
     <color name="default_item_background">#E8F5E9</color>
+    <color name="sentiment_positive_light">#E8F5E9</color>
+    <color name="sentiment_negative_light">#FFEBEE</color>
+    <color name="sentiment_neutral_light">#F5F5F5</color>
 </resources>
