@@ -14,10 +14,6 @@
     <string name="sentiment_negative">Negative</string>
     <string name="sentiment_neutral">Neutral</string>
     
-    <string name="view_day">Day</string>
-    <string name="view_week">Week</string>
-    <string name="view_month">Month</string>
-    
     <string name="statistics">Statistics</string>
     <string name="all_items">All Items</string>
     
