@@ -306,12 +306,14 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val selectedDateStr = getDateString(selectedDate)
         val isToday = dateStr == todayStr
         val isSelected = dateStr == selectedDateStr
+        val inSingleItemView = isInSingleItemView()
 
         val dayView = LayoutInflater.from(this).inflate(R.layout.item_month_day, monthGrid, false)
         val tvDay = dayView.findViewById<TextView>(R.id.tv_day)
         val dotsContainer = dayView.findViewById<LinearLayout>(R.id.dots_container)
         val tvMoreCount = dayView.findViewById<TextView>(R.id.tv_more_count)
         val dayContainer = dayView.findViewById<LinearLayout>(R.id.day_container)
+        val checkOverlay = dayView.findViewById<android.widget.ImageView>(R.id.check_overlay)
 
         tvDay.text = day.toString()
         
@@ -321,71 +323,122 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             tvDay.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
         }
 
-        // Set background based on date type
-        when {
-            isToday && isSelected -> {
-                // Both today and selected: light green background + green frame
-                dayContainer.setBackgroundResource(R.drawable.selected_today_background)
-            }
-            isSelected -> {
-                // Selected date gets green frame only
-                dayContainer.setBackgroundResource(R.drawable.selected_day_background)
-            }
-            isToday -> {
-                // Today gets light green background only
+        // Set background based on date type and view mode
+        if (inSingleItemView) {
+            // Single item view: only show today highlight, no selected day border
+            if (isToday) {
                 dayContainer.setBackgroundResource(R.drawable.current_day_background)
-            }
-            else -> {
-                // Default: transparent background
+            } else {
                 dayContainer.setBackgroundColor(android.graphics.Color.TRANSPARENT)
             }
-        }
-
-        val entries = database.getEntriesForDate(dateStr).filter { it.occurred }
-        val maxDots = 4
-        val dotSize = (6 * resources.displayMetrics.density).toInt()
-        val dotMargin = (1 * resources.displayMetrics.density).toInt()
-        
-        for (entry in entries.take(maxDots)) {
-            val item = items.find { it.id == entry.trackingItemId }
-            if (item != null) {
-                val dot = View(this)
-                val dotParams = LinearLayout.LayoutParams(dotSize, dotSize)
-                dotParams.setMargins(dotMargin, 0, dotMargin, 0)
-                dot.layoutParams = dotParams
-                dot.setBackgroundResource(R.drawable.circle_indicator)
-                val color = when (item.sentiment) {
-                    Sentiment.POSITIVE -> R.color.sentiment_positive
-                    Sentiment.NEGATIVE -> R.color.sentiment_negative
-                    Sentiment.NEUTRAL -> R.color.sentiment_neutral
+        } else {
+            // Main view: show both today and selected day styling
+            when {
+                isToday && isSelected -> {
+                    dayContainer.setBackgroundResource(R.drawable.selected_today_background)
                 }
-                dot.background.setTint(ContextCompat.getColor(this, color))
-                dotsContainer.addView(dot)
+                isSelected -> {
+                    dayContainer.setBackgroundResource(R.drawable.selected_day_background)
+                }
+                isToday -> {
+                    dayContainer.setBackgroundResource(R.drawable.current_day_background)
+                }
+                else -> {
+                    dayContainer.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                }
             }
         }
-        
-        // Show "+N" text below dots if there are more entries
-        if (entries.size > maxDots) {
-            val hiddenCount = entries.size - maxDots
-            tvMoreCount.text = "+$hiddenCount"
-            tvMoreCount.visibility = View.VISIBLE
+
+        // Filter entries based on view mode
+        val entries = if (inSingleItemView) {
+            database.getEntriesForDate(dateStr).filter { it.occurred && it.trackingItemId == selectedItemId }
         } else {
-            tvMoreCount.text = ""
-            tvMoreCount.visibility = View.INVISIBLE
+            database.getEntriesForDate(dateStr).filter { it.occurred }
+        }
+        
+        if (inSingleItemView) {
+            // Single item view: show overlay checkmark if marked
+            dotsContainer.visibility = View.GONE
+            tvMoreCount.visibility = View.GONE
+            if (entries.isNotEmpty()) {
+                val item = items.find { it.id == selectedItemId }
+                if (item != null) {
+                    val color = when (item.sentiment) {
+                        Sentiment.POSITIVE -> R.color.sentiment_positive
+                        Sentiment.NEGATIVE -> R.color.sentiment_negative
+                        Sentiment.NEUTRAL -> R.color.sentiment_neutral
+                    }
+                    checkOverlay.setColorFilter(ContextCompat.getColor(this, color))
+                    checkOverlay.visibility = View.VISIBLE
+                }
+            } else {
+                checkOverlay.visibility = View.GONE
+            }
+        } else {
+            // Main view: show dots
+            val maxDots = 4
+            val dotSize = (6 * resources.displayMetrics.density).toInt()
+            val dotMargin = (1 * resources.displayMetrics.density).toInt()
+            
+            for (entry in entries.take(maxDots)) {
+                val item = items.find { it.id == entry.trackingItemId }
+                if (item != null) {
+                    val dot = View(this)
+                    val dotParams = LinearLayout.LayoutParams(dotSize, dotSize)
+                    dotParams.setMargins(dotMargin, 0, dotMargin, 0)
+                    dot.layoutParams = dotParams
+                    dot.setBackgroundResource(R.drawable.circle_indicator)
+                    val color = when (item.sentiment) {
+                        Sentiment.POSITIVE -> R.color.sentiment_positive
+                        Sentiment.NEGATIVE -> R.color.sentiment_negative
+                        Sentiment.NEUTRAL -> R.color.sentiment_neutral
+                    }
+                    dot.background.setTint(ContextCompat.getColor(this, color))
+                    dotsContainer.addView(dot)
+                }
+            }
+            
+            // Show "+N" text below dots if there are more entries
+            if (entries.size > maxDots) {
+                val hiddenCount = entries.size - maxDots
+                tvMoreCount.text = "+$hiddenCount"
+                tvMoreCount.visibility = View.VISIBLE
+            } else {
+                tvMoreCount.text = ""
+                tvMoreCount.visibility = View.INVISIBLE
+            }
         }
 
-        // Use captured time to avoid stale calendar reference
-        dayView.setOnClickListener {
-            selectedDate.timeInMillis = capturedTime
-            setupMonthView()
-            loadTrackingItems()
-        }
+        // Set click behavior based on view mode
+        if (inSingleItemView) {
+            // Single item view: click toggles mark for this item on this day
+            dayView.setOnClickListener {
+                selectedItemId?.let { itemId ->
+                    val entry = database.getEntry(itemId, dateStr)
+                    if (entry?.occurred == true) {
+                        database.deleteEntry(itemId, dateStr)
+                    } else {
+                        database.setEntry(itemId, dateStr, true)
+                    }
+                    setupMonthView()
+                }
+            }
+            // No long-click action in single item view
+            dayView.setOnLongClickListener { true }
+        } else {
+            // Main view: click selects day, long-click shows mark dialog
+            dayView.setOnClickListener {
+                selectedDate.timeInMillis = capturedTime
+                setupMonthView()
+                loadTrackingItems()
+            }
 
-        dayView.setOnLongClickListener {
-            selectedDate.timeInMillis = capturedTime
-            setupMonthView()
-            showDayMarkDialog()
-            true
+            dayView.setOnLongClickListener {
+                selectedDate.timeInMillis = capturedTime
+                setupMonthView()
+                showDayMarkDialog()
+                true
+            }
         }
 
         val params = android.widget.GridLayout.LayoutParams()
@@ -405,11 +458,15 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             supportActionBar?.title = ""
         }
         
-        val items = if (selectedItemId != null) {
-            listOfNotNull(database.getTrackingItem(selectedItemId!!))
-        } else {
-            database.getAllTrackingItems()
+        // In single-item view, hide the list entirely (calendar click handles marking)
+        if (isInSingleItemView()) {
+            emptyState.visibility = View.GONE
+            trackingScrollView.visibility = View.GONE
+            fabAddItem.visibility = View.GONE
+            return
         }
+        
+        val items = database.getAllTrackingItems()
 
         val newMarkedItems = mutableMapOf<Long, Boolean>()
         val dateStr = getDateString(selectedDate)  // Use selectedDate for tracking items
@@ -427,7 +484,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         } else {
             emptyState.visibility = View.GONE
             trackingScrollView.visibility = View.VISIBLE
-            fabAddItem.visibility = if (selectedItemId == null) View.VISIBLE else View.GONE
+            fabAddItem.visibility = View.VISIBLE
 
             if (!::itemAdapter.isInitialized) {
                 itemAdapter = TrackingItemAdapter(this, items, markedItems, this)
@@ -600,6 +657,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         selectedItemId = item.id
         supportActionBar?.title = item.name
         drawerLayout.closeDrawer(GravityCompat.START)
+        updateToolbarForViewMode()
         loadData()
     }
 
@@ -662,15 +720,36 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
+        menu.clear()
+        if (selectedItemId != null) {
+            menuInflater.inflate(R.menu.item_menu, menu)
+        } else {
+            menuInflater.inflate(R.menu.main_menu, menu)
+        }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_statistics -> {
-                // TODO: Implement statistics view
+                showStatisticsDialog()
                 true
+            }
+            R.id.action_item_options -> {
+                selectedItemId?.let { itemId ->
+                    database.getTrackingItem(itemId)?.let { trackingItem ->
+                        showItemOptionsDialog(trackingItem)
+                    }
+                }
+                true
+            }
+            android.R.id.home -> {
+                if (selectedItemId != null) {
+                    goToMainView()
+                    true
+                } else {
+                    super.onOptionsItemSelected(item)
+                }
             }
             else -> super.onOptionsItemSelected(item)
         }
@@ -679,8 +758,23 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)
+        } else if (selectedItemId != null) {
+            goToMainView()
         } else {
             super.onBackPressed()
         }
     }
+
+    private fun goToMainView() {
+        selectedItemId = null
+        supportActionBar?.title = ""
+        updateToolbarForViewMode()
+        loadData()
+    }
+
+    private fun updateToolbarForViewMode() {
+        invalidateOptionsMenu()
+    }
+
+    private fun isInSingleItemView(): Boolean = selectedItemId != null
 }
