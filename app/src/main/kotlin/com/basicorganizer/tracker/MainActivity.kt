@@ -315,6 +315,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val tvMoreCount = dayView.findViewById<TextView>(R.id.tv_more_count)
         val dayContainer = dayView.findViewById<LinearLayout>(R.id.day_container)
         val checkOverlay = dayView.findViewById<android.widget.ImageView>(R.id.check_overlay)
+        val noteIndicator = dayView.findViewById<android.widget.ImageView>(R.id.note_indicator)
 
         tvDay.text = day.toString()
         
@@ -410,6 +411,17 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             }
         }
 
+        // Show note indicator in single-item view if there's a note
+        if (inSingleItemView && selectedItemId != null) {
+            if (database.hasNoteForDate(selectedItemId!!, dateStr)) {
+                noteIndicator.visibility = View.VISIBLE
+            } else {
+                noteIndicator.visibility = View.GONE
+            }
+        } else {
+            noteIndicator.visibility = View.GONE
+        }
+
         // Set click behavior based on view mode
         if (inSingleItemView) {
             // Single item view: click toggles mark for this item on this day
@@ -424,8 +436,13 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                     setupMonthView()
                 }
             }
-            // No long-click action in single item view
-            dayView.setOnLongClickListener { true }
+            // Long-click shows note dialog in single item view
+            dayView.setOnLongClickListener {
+                selectedItemId?.let { itemId ->
+                    showNoteDialog(itemId, dateStr)
+                }
+                true
+            }
         } else {
             // Main view: click selects day, long-click shows mark dialog
             dayView.setOnClickListener {
@@ -601,6 +618,57 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             .show()
     }
 
+    private fun showNoteDialog(itemId: Long, dateStr: String) {
+        val existingNote = database.getNote(itemId, dateStr)
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_note, null)
+        val etNote = dialogView.findViewById<EditText>(R.id.et_note)
+        
+        existingNote?.let {
+            etNote.setText(it.text)
+        }
+
+        val dateFormat = SimpleDateFormat("d MMMM yyyy", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        try {
+            val parsedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(dateStr)
+            if (parsedDate != null) {
+                calendar.time = parsedDate
+            }
+        } catch (e: Exception) {}
+        val displayDate = dateFormat.format(calendar.time)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Note for $displayDate")
+            .setView(dialogView)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val noteText = etNote.text.toString().trim()
+                database.saveNote(itemId, dateStr, noteText)
+                setupMonthView()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+
+        dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
+        dialog.setOnShowListener {
+            etNote.requestFocus()
+            etNote.postDelayed({
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(etNote, InputMethodManager.SHOW_FORCED)
+            }, 100)
+        }
+        dialog.show()
+    }
+
+    private fun openNotesActivity() {
+        val itemId = selectedItemId ?: return
+        val item = database.getTrackingItem(itemId) ?: return
+        
+        val intent = Intent(this, NotesActivity::class.java)
+        intent.putExtra(NotesActivity.EXTRA_ITEM_ID, itemId)
+        intent.putExtra(NotesActivity.EXTRA_ITEM_NAME, item.name)
+        startActivity(intent)
+    }
+
     private fun showTipsDialog() {
         // TODO: Implement tips dialog showing how to use the app
         Toast.makeText(this, "Tips coming soon!", Toast.LENGTH_SHORT).show()
@@ -734,6 +802,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         return when (item.itemId) {
             R.id.action_statistics -> {
                 showStatisticsDialog()
+                true
+            }
+            R.id.action_notes -> {
+                openNotesActivity()
                 true
             }
             R.id.action_item_options -> {

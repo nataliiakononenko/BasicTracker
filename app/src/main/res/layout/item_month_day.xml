@@ -45,4 +45,12 @@
         android:layout_gravity="center"
         android:src="@drawable/ic_check"
         android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/note_indicator"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/ic_note_indicator"
+        android:visibility="gone" />
 </FrameLayout>

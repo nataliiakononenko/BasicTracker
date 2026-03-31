@@ -8,11 +8,12 @@ import android.database.sqlite.SQLiteOpenHelper
 class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
         private const val DATABASE_NAME = "TrackerDB"
 
         private const val TABLE_ITEMS = "tracking_items"
         private const val TABLE_ENTRIES = "tracking_entries"
+        private const val TABLE_NOTES = "notes"
 
         private const val KEY_ID = "id"
         private const val KEY_NAME = "name"
@@ -23,6 +24,7 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         private const val KEY_ITEM_ID = "item_id"
         private const val KEY_DATE = "date"
         private const val KEY_OCCURRED = "occurred"
+        private const val KEY_TEXT = "text"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -47,10 +49,32 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             )
         """.trimIndent()
         db.execSQL(createEntriesTable)
+
+        val createNotesTable = """
+            CREATE TABLE $TABLE_NOTES (
+                $KEY_ID INTEGER PRIMARY KEY,
+                $KEY_ITEM_ID INTEGER,
+                $KEY_DATE TEXT,
+                $KEY_TEXT TEXT,
+                UNIQUE($KEY_ITEM_ID, $KEY_DATE)
+            )
+        """.trimIndent()
+        db.execSQL(createNotesTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // Handle future migrations here
+        if (oldVersion < 2) {
+            val createNotesTable = """
+                CREATE TABLE $TABLE_NOTES (
+                    $KEY_ID INTEGER PRIMARY KEY,
+                    $KEY_ITEM_ID INTEGER,
+                    $KEY_DATE TEXT,
+                    $KEY_TEXT TEXT,
+                    UNIQUE($KEY_ITEM_ID, $KEY_DATE)
+                )
+            """.trimIndent()
+            db.execSQL(createNotesTable)
+        }
     }
 
     fun addTrackingItem(item: TrackingItem): Long {
@@ -272,6 +296,96 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
     fun deleteEntry(itemId: Long, date: String) {
         val db = writableDatabase
         db.delete(TABLE_ENTRIES, "$KEY_ITEM_ID = ? AND $KEY_DATE = ?", arrayOf(itemId.toString(), date))
+        db.close()
+    }
+
+    // Note methods
+    fun saveNote(itemId: Long, date: String, text: String) {
+        val db = writableDatabase
+        if (text.isBlank()) {
+            db.delete(TABLE_NOTES, "$KEY_ITEM_ID = ? AND $KEY_DATE = ?", arrayOf(itemId.toString(), date))
+        } else {
+            val values = ContentValues().apply {
+                put(KEY_ITEM_ID, itemId)
+                put(KEY_DATE, date)
+                put(KEY_TEXT, text)
+            }
+            db.insertWithOnConflict(TABLE_NOTES, null, values, SQLiteDatabase.CONFLICT_REPLACE)
+        }
+        db.close()
+    }
+
+    fun getNote(itemId: Long, date: String): Note? {
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_NOTES,
+            null,
+            "$KEY_ITEM_ID = ? AND $KEY_DATE = ?",
+            arrayOf(itemId.toString(), date),
+            null, null, null
+        )
+
+        return if (cursor.moveToFirst()) {
+            val note = Note(
+                id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_ID)),
+                trackingItemId = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_ITEM_ID)),
+                date = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)),
+                text = cursor.getString(cursor.getColumnIndexOrThrow(KEY_TEXT))
+            )
+            cursor.close()
+            note
+        } else {
+            cursor.close()
+            null
+        }
+    }
+
+    fun getNotesForItem(itemId: Long): List<Note> {
+        val notes = mutableListOf<Note>()
+        val db = readableDatabase
+        val cursor = db.query(
+            TABLE_NOTES,
+            null,
+            "$KEY_ITEM_ID = ?",
+            arrayOf(itemId.toString()),
+            null, null, "$KEY_DATE DESC"
+        )
+
+        if (cursor.moveToFirst()) {
+            do {
+                val note = Note(
+                    id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_ID)),
+                    trackingItemId = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_ITEM_ID)),
+                    date = cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)),
+                    text = cursor.getString(cursor.getColumnIndexOrThrow(KEY_TEXT))
+                )
+                notes.add(note)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return notes
+    }
+
+    fun hasNoteForDate(itemId: Long, date: String): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM $TABLE_NOTES WHERE $KEY_ITEM_ID = ? AND $KEY_DATE = ? AND $KEY_TEXT != ''",
+            arrayOf(itemId.toString(), date)
+        )
+        val hasNote = if (cursor.moveToFirst()) cursor.getInt(0) > 0 else false
+        cursor.close()
+        return hasNote
+    }
+
+    fun deleteNote(itemId: Long, date: String) {
+        val db = writableDatabase
+        db.delete(TABLE_NOTES, "$KEY_ITEM_ID = ? AND $KEY_DATE = ?", arrayOf(itemId.toString(), date))
+        db.close()
+    }
+
+    fun deleteNotesForItem(itemId: Long) {
+        val db = writableDatabase
+        db.delete(TABLE_NOTES, "$KEY_ITEM_ID = ?", arrayOf(itemId.toString()))
         db.close()
     }
 }
