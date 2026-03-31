@@ -241,6 +241,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
         setupWeekDayHeaders()
         setupMonthView()
+
+        if (isInSingleItemView()) {
+            selectedItemId?.let { loadItemNotes(it) }
+        }
     }
 
     private fun setupWeekDayHeaders() {
@@ -530,9 +534,38 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         }
     }
 
+    private fun getVisibleGridDateRange(): Pair<String, String> {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        val calendar = currentDate.clone() as Calendar
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        var firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY
+        if (firstDayOfWeek < 0) firstDayOfWeek += 7
+
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+        // First visible date: go back to the Monday that starts the grid
+        val firstVisible = currentDate.clone() as Calendar
+        firstVisible.set(Calendar.DAY_OF_MONTH, 1)
+        firstVisible.add(Calendar.DAY_OF_MONTH, -firstDayOfWeek)
+
+        // Last visible date: fill remaining cells after month ends
+        val totalCells = firstDayOfWeek + daysInMonth
+        val remainingCells = if (totalCells % 7 == 0) 0 else 7 - (totalCells % 7)
+        val lastVisible = currentDate.clone() as Calendar
+        lastVisible.set(Calendar.DAY_OF_MONTH, daysInMonth)
+        lastVisible.add(Calendar.DAY_OF_MONTH, remainingCells)
+
+        return Pair(dateFormat.format(firstVisible.time), dateFormat.format(lastVisible.time))
+    }
+
     private fun loadItemNotes(itemId: Long) {
         notesListContainer.removeAllViews()
-        val notes = database.getNotesForItem(itemId).take(5)
+
+        val (rangeStart, rangeEnd) = getVisibleGridDateRange()
+        val notes = database.getNotesForItem(itemId)
+            .filter { it.date >= rangeStart && it.date <= rangeEnd }
+            .sortedBy { it.date }
 
         if (notes.isEmpty()) {
             tvNoNotes.visibility = View.VISIBLE
