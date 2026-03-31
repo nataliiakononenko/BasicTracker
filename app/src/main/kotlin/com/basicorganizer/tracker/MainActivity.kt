@@ -158,6 +158,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             selectedItemId = null
             supportActionBar?.title = ""
             drawerLayout.closeDrawer(GravityCompat.START)
+            invalidateOptionsMenu()
             loadData()
         }
 
