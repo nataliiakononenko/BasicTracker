@@ -20,4 +20,5 @@
     <color name="sentiment_positive_light">#E8F5E9</color>
     <color name="sentiment_negative_light">#FFEBEE</color>
     <color name="sentiment_neutral_light">#F5F5F5</color>
+    <color name="divider">#E0E0E0</color>
 </resources>

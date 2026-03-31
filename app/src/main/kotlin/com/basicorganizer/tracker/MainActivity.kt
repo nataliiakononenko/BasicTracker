@@ -862,6 +862,16 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         startActivity(intent)
     }
 
+    private fun openStatisticsActivity() {
+        val items = database.getAllTrackingItems()
+        if (items.isEmpty()) {
+            Toast.makeText(this, "No items to show statistics for", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val intent = Intent(this, StatisticsActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun showTipsDialog() {
         // TODO: Implement tips dialog showing how to use the app
         Toast.makeText(this, "Tips coming soon!", Toast.LENGTH_SHORT).show()
@@ -994,7 +1004,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_statistics -> {
-                showStatisticsDialog()
+                openStatisticsActivity()
                 true
             }
             R.id.action_notes -> {
