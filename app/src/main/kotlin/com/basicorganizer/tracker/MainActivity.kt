@@ -310,6 +310,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val dayView = LayoutInflater.from(this).inflate(R.layout.item_month_day, monthGrid, false)
         val tvDay = dayView.findViewById<TextView>(R.id.tv_day)
         val dotsContainer = dayView.findViewById<LinearLayout>(R.id.dots_container)
+        val tvMoreCount = dayView.findViewById<TextView>(R.id.tv_more_count)
         val dayContainer = dayView.findViewById<LinearLayout>(R.id.day_container)
 
         tvDay.text = day.toString()
@@ -340,27 +341,37 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             }
         }
 
-        val entries = database.getEntriesForDate(dateStr)
-        for (entry in entries.take(4)) {
-            if (entry.occurred) {
-                val item = items.find { it.id == entry.trackingItemId }
-                if (item != null) {
-                    val dot = View(this)
-                    val dotSize = (6 * resources.displayMetrics.density).toInt()
-                    val dotMargin = (1.5 * resources.displayMetrics.density).toInt()
-                    val dotParams = LinearLayout.LayoutParams(dotSize, dotSize)
-                    dotParams.setMargins(dotMargin, 0, dotMargin, 0)
-                    dot.layoutParams = dotParams
-                    dot.setBackgroundResource(R.drawable.circle_indicator)
-                    val color = when (item.sentiment) {
-                        Sentiment.POSITIVE -> R.color.sentiment_positive
-                        Sentiment.NEGATIVE -> R.color.sentiment_negative
-                        Sentiment.NEUTRAL -> R.color.sentiment_neutral
-                    }
-                    dot.background.setTint(ContextCompat.getColor(this, color))
-                    dotsContainer.addView(dot)
+        val entries = database.getEntriesForDate(dateStr).filter { it.occurred }
+        val maxDots = 4
+        val dotSize = (6 * resources.displayMetrics.density).toInt()
+        val dotMargin = (1 * resources.displayMetrics.density).toInt()
+        
+        for (entry in entries.take(maxDots)) {
+            val item = items.find { it.id == entry.trackingItemId }
+            if (item != null) {
+                val dot = View(this)
+                val dotParams = LinearLayout.LayoutParams(dotSize, dotSize)
+                dotParams.setMargins(dotMargin, 0, dotMargin, 0)
+                dot.layoutParams = dotParams
+                dot.setBackgroundResource(R.drawable.circle_indicator)
+                val color = when (item.sentiment) {
+                    Sentiment.POSITIVE -> R.color.sentiment_positive
+                    Sentiment.NEGATIVE -> R.color.sentiment_negative
+                    Sentiment.NEUTRAL -> R.color.sentiment_neutral
                 }
+                dot.background.setTint(ContextCompat.getColor(this, color))
+                dotsContainer.addView(dot)
             }
+        }
+        
+        // Show "+N" text below dots if there are more entries
+        if (entries.size > maxDots) {
+            val hiddenCount = entries.size - maxDots
+            tvMoreCount.text = "+$hiddenCount"
+            tvMoreCount.visibility = View.VISIBLE
+        } else {
+            tvMoreCount.text = ""
+            tvMoreCount.visibility = View.INVISIBLE
         }
 
         // Use captured time to avoid stale calendar reference
