@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var notesScrollView: View
     private lateinit var notesListContainer: LinearLayout
     private lateinit var tvNoNotes: TextView
+    private lateinit var fabAddNote: com.google.android.material.floatingactionbutton.FloatingActionButton
     private lateinit var database: TrackerDatabase
     private lateinit var itemAdapter: TrackingItemAdapter
     private lateinit var drawerAdapter: DrawerItemAdapter
@@ -106,6 +107,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesScrollView = findViewById(R.id.notes_scroll_view)
         notesListContainer = findViewById(R.id.notes_list_container)
         tvNoNotes = findViewById(R.id.tv_no_notes)
+        fabAddNote = findViewById(R.id.fab_add_note)
         rvTrackingItems.layoutManager = LinearLayoutManager(this)
 
         val navView = findViewById<NavigationView>(R.id.nav_view)
@@ -486,12 +488,18 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             trackingScrollView.visibility = View.GONE
             fabAddItem.visibility = View.GONE
             notesScrollView.visibility = View.VISIBLE
+            fabAddNote.visibility = View.VISIBLE
+            fabAddNote.setOnClickListener {
+                val today = getDateString(Calendar.getInstance())
+                selectedItemId?.let { itemId -> showNoteDialog(itemId, today) }
+            }
             loadItemNotes(selectedItemId!!)
             return
         }
 
         // Main view: hide notes
         notesScrollView.visibility = View.GONE
+        fabAddNote.visibility = View.GONE
         
         val items = database.getAllTrackingItems()
 
