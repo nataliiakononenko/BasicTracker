@@ -229,6 +229,16 @@ class StatisticsActivity : AppCompatActivity() {
             }
         }
         
-        lineGraph.setData(graphData)
+        // Generate X-axis labels (dates)
+        val xLabels = mutableListOf<String>()
+        val labelFormat = SimpleDateFormat("d/M", Locale.getDefault())
+        val tempCal = Calendar.getInstance()
+        tempCal.add(Calendar.DAY_OF_MONTH, -29)
+        for (i in 0 until 30) {
+            xLabels.add(labelFormat.format(tempCal.time))
+            tempCal.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        
+        lineGraph.setData(graphData, xLabels)
     }
 }
