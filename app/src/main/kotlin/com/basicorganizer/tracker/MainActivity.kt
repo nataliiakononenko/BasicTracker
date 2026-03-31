@@ -47,14 +47,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var btnNextMonth: android.widget.ImageButton
     private lateinit var weekHeader: LinearLayout
     private lateinit var monthViewContainer: View
-    private lateinit var statsScrollView: View
-    private lateinit var statsGraphContainer: LinearLayout
-    private lateinit var tvStatsThisMonth: TextView
-    private lateinit var tvStatsTotal: TextView
-    private lateinit var tvStatsAvgWeekMonth: TextView
-    private lateinit var tvStatsAvgWeekOverall: TextView
-    private lateinit var tvStatsStreak: TextView
-    private lateinit var tvStatsLongestStreak: TextView
+    private lateinit var notesScrollView: View
+    private lateinit var notesListContainer: LinearLayout
+    private lateinit var tvNoNotes: TextView
 
     private lateinit var database: TrackerDatabase
     private lateinit var itemAdapter: TrackingItemAdapter
@@ -109,14 +104,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         btnNextMonth = findViewById(R.id.btn_next_month)
         weekHeader = findViewById(R.id.week_header)
         monthViewContainer = findViewById(R.id.month_view_container)
-        statsScrollView = findViewById(R.id.stats_scroll_view)
-        statsGraphContainer = findViewById(R.id.stats_graph_container)
-        tvStatsThisMonth = findViewById(R.id.tv_stats_this_month)
-        tvStatsTotal = findViewById(R.id.tv_stats_total)
-        tvStatsAvgWeekMonth = findViewById(R.id.tv_stats_avg_week_month)
-        tvStatsAvgWeekOverall = findViewById(R.id.tv_stats_avg_week_overall)
-        tvStatsStreak = findViewById(R.id.tv_stats_streak)
-        tvStatsLongestStreak = findViewById(R.id.tv_stats_longest_streak)
+        notesScrollView = findViewById(R.id.notes_scroll_view)
+        notesListContainer = findViewById(R.id.notes_list_container)
+        tvNoNotes = findViewById(R.id.tv_no_notes)
 
         rvTrackingItems.layoutManager = LinearLayoutManager(this)
 
@@ -450,7 +440,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                         database.setEntry(itemId, dateStr, true)
                     }
                     setupMonthView()
-                    loadItemStatistics(itemId)
                 }
             }
             // Long-click shows note dialog in single item view
@@ -493,18 +482,18 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             supportActionBar?.title = ""
         }
         
-        // In single-item view, hide the list and show stats instead
+        // In single-item view, hide the list and show notes instead
         if (isInSingleItemView()) {
             emptyState.visibility = View.GONE
             trackingScrollView.visibility = View.GONE
             fabAddItem.visibility = View.GONE
-            statsScrollView.visibility = View.VISIBLE
-            loadItemStatistics(selectedItemId!!)
+            notesScrollView.visibility = View.VISIBLE
+            loadItemNotes(selectedItemId!!)
             return
         }
         
-        // Main view: hide stats
-        statsScrollView.visibility = View.GONE
+        // Main view: hide notes
+        notesScrollView.visibility = View.GONE
         
         val items = database.getAllTrackingItems()
 
@@ -545,174 +534,59 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         drawerAdapter.setDefaultItemId(defaultItemId)
     }
 
-    private fun loadItemStatistics(itemId: Long) {
-        val item = database.getTrackingItem(itemId) ?: return
-        val entries = database.getEntriesForItem(itemId).filter { it.occurred }
+    private fun loadItemNotes(itemId: Long) {
+        notesListContainer.removeAllViews()
+        val notes = database.getNotesForItem(itemId).take(5) // Show last 5 notes
         
-        // This month stats
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        calendar.set(year, month, 1)
-        val monthStart = getDateString(calendar)
-        calendar.set(year, month, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-        val monthEnd = getDateString(calendar)
-        
-        val thisMonthCount = database.countOccurrencesForItemInRange(itemId, monthStart, monthEnd)
-        val totalCount = database.countOccurrencesForItem(itemId)
-        
-        tvStatsThisMonth.text = "$thisMonthCount times"
-        tvStatsTotal.text = "$totalCount times"
-        
-        // Calculate weeks in current month
-        calendar.set(year, month, 1)
-        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val weeksInMonth = daysInMonth / 7.0
-        val avgWeekMonth = if (weeksInMonth > 0) thisMonthCount / weeksInMonth else 0.0
-        tvStatsAvgWeekMonth.text = String.format("%.1f", avgWeekMonth)
-        
-        // Calculate overall weeks since first entry
-        if (entries.isNotEmpty()) {
-            val firstEntryDate = entries.minByOrNull { it.date }?.date
-            if (firstEntryDate != null) {
-                try {
-                    val parseFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    val firstDate = parseFormat.parse(firstEntryDate)
-                    val today = Date()
-                    if (firstDate != null) {
-                        val daysSinceStart = ((today.time - firstDate.time) / (1000 * 60 * 60 * 24)).toInt() + 1
-                        val weeksSinceStart = daysSinceStart / 7.0
-                        val avgWeekOverall = if (weeksSinceStart > 0) totalCount / weeksSinceStart else 0.0
-                        tvStatsAvgWeekOverall.text = String.format("%.1f", avgWeekOverall)
-                    }
-                } catch (e: Exception) {
-                    tvStatsAvgWeekOverall.text = "0.0"
-                }
-            }
+        if (notes.isEmpty()) {
+            tvNoNotes.visibility = View.VISIBLE
         } else {
-            tvStatsAvgWeekOverall.text = "0.0"
-        }
-        
-        // Calculate streaks
-        val sortedDates = entries.map { it.date }.sorted()
-        var currentStreak = 0
-        var longestStreak = 0
-        var tempStreak = 0
-        
-        val todayStr = getDateString(Calendar.getInstance())
-        val yesterdayCalendar = Calendar.getInstance()
-        yesterdayCalendar.add(Calendar.DAY_OF_MONTH, -1)
-        val yesterdayStr = getDateString(yesterdayCalendar)
-        
-        // Check if today or yesterday is marked for current streak
-        val hasToday = sortedDates.contains(todayStr)
-        val hasYesterday = sortedDates.contains(yesterdayStr)
-        
-        if (hasToday || hasYesterday) {
-            val startDate = if (hasToday) todayStr else yesterdayStr
-            var checkDate = Calendar.getInstance()
-            if (!hasToday) checkDate.add(Calendar.DAY_OF_MONTH, -1)
+            tvNoNotes.visibility = View.GONE
             
-            while (sortedDates.contains(getDateString(checkDate))) {
-                currentStreak++
-                checkDate.add(Calendar.DAY_OF_MONTH, -1)
-            }
-        }
-        
-        // Calculate longest streak
-        if (sortedDates.isNotEmpty()) {
+            val dateFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
             val parseFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            var prevDate: Calendar? = null
             
-            for (dateStr in sortedDates) {
-                try {
-                    val date = parseFormat.parse(dateStr)
-                    if (date != null) {
-                        val cal = Calendar.getInstance()
-                        cal.time = date
-                        
-                        if (prevDate == null) {
-                            tempStreak = 1
-                        } else {
-                            val diff = ((cal.timeInMillis - prevDate.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
-                            if (diff == 1) {
-                                tempStreak++
-                            } else {
-                                longestStreak = maxOf(longestStreak, tempStreak)
-                                tempStreak = 1
-                            }
-                        }
-                        prevDate = cal
-                    }
-                } catch (e: Exception) {}
+            for (note in notes) {
+                val noteView = LinearLayout(this)
+                noteView.orientation = LinearLayout.VERTICAL
+                noteView.setPadding(
+                    (12 * resources.displayMetrics.density).toInt(),
+                    (8 * resources.displayMetrics.density).toInt(),
+                    (12 * resources.displayMetrics.density).toInt(),
+                    (8 * resources.displayMetrics.density).toInt()
+                )
+                noteView.setBackgroundResource(R.drawable.tracking_item_border)
+                val params = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(0, 0, 0, (8 * resources.displayMetrics.density).toInt())
+                noteView.layoutParams = params
+                
+                val displayDate = try {
+                    val date = parseFormat.parse(note.date)
+                    if (date != null) dateFormat.format(date) else note.date
+                } catch (e: Exception) { note.date }
+                
+                val dateText = TextView(this)
+                dateText.text = displayDate
+                dateText.textSize = 12f
+                dateText.setTextColor(ContextCompat.getColor(this, R.color.sentiment_positive))
+                
+                val noteText = TextView(this)
+                noteText.text = note.text
+                noteText.textSize = 14f
+                noteText.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
+                
+                noteView.addView(dateText)
+                noteView.addView(noteText)
+                
+                noteView.setOnClickListener {
+                    showNoteDialog(itemId, note.date)
+                }
+                
+                notesListContainer.addView(noteView)
             }
-            longestStreak = maxOf(longestStreak, tempStreak)
-        }
-        
-        tvStatsStreak.text = "$currentStreak days"
-        tvStatsLongestStreak.text = "$longestStreak days"
-        
-        // Draw graph (last 12 months)
-        drawMonthlyGraph(itemId, item.sentiment)
-    }
-
-    private fun drawMonthlyGraph(itemId: Long, sentiment: Sentiment) {
-        statsGraphContainer.removeAllViews()
-        
-        val calendar = Calendar.getInstance()
-        val monthCounts = mutableListOf<Int>()
-        val monthLabels = mutableListOf<String>()
-        val labelFormat = SimpleDateFormat("MMM", Locale.getDefault())
-        
-        // Get last 6 months of data
-        for (i in 5 downTo 0) {
-            val cal = Calendar.getInstance()
-            cal.add(Calendar.MONTH, -i)
-            val year = cal.get(Calendar.YEAR)
-            val month = cal.get(Calendar.MONTH)
-            
-            cal.set(year, month, 1)
-            val monthStart = getDateString(cal)
-            cal.set(year, month, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
-            val monthEnd = getDateString(cal)
-            
-            val count = database.countOccurrencesForItemInRange(itemId, monthStart, monthEnd)
-            monthCounts.add(count)
-            monthLabels.add(labelFormat.format(cal.time))
-        }
-        
-        val maxCount = monthCounts.maxOrNull() ?: 1
-        val barColor = when (sentiment) {
-            Sentiment.POSITIVE -> R.color.sentiment_positive
-            Sentiment.NEGATIVE -> R.color.sentiment_negative
-            Sentiment.NEUTRAL -> R.color.sentiment_neutral
-        }
-        
-        for (i in monthCounts.indices) {
-            val barContainer = LinearLayout(this)
-            barContainer.orientation = LinearLayout.VERTICAL
-            barContainer.gravity = android.view.Gravity.BOTTOM or android.view.Gravity.CENTER_HORIZONTAL
-            val containerParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
-            containerParams.setMargins(4, 0, 4, 0)
-            barContainer.layoutParams = containerParams
-            
-            // Bar
-            val bar = View(this)
-            val barHeight = if (maxCount > 0) ((monthCounts[i].toFloat() / maxCount) * 60 * resources.displayMetrics.density).toInt() else 0
-            val barParams = LinearLayout.LayoutParams((16 * resources.displayMetrics.density).toInt(), maxOf(barHeight, (4 * resources.displayMetrics.density).toInt()))
-            bar.layoutParams = barParams
-            bar.setBackgroundColor(ContextCompat.getColor(this, barColor))
-            
-            // Label
-            val label = TextView(this)
-            label.text = monthLabels[i]
-            label.textSize = 9f
-            label.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
-            label.gravity = android.view.Gravity.CENTER
-            
-            barContainer.addView(bar)
-            barContainer.addView(label)
-            statsGraphContainer.addView(barContainer)
         }
     }
 
@@ -837,6 +711,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 val noteText = etNote.text.toString().trim()
                 database.saveNote(itemId, dateStr, noteText)
                 setupMonthView()
+                loadItemNotes(itemId)
             }
             .setNegativeButton(R.string.cancel, null)
             .create()
@@ -869,6 +744,16 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             return
         }
         val intent = Intent(this, StatisticsActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun openItemStatisticsActivity() {
+        val itemId = selectedItemId ?: return
+        val item = database.getTrackingItem(itemId) ?: return
+        
+        val intent = Intent(this, ItemStatisticsActivity::class.java)
+        intent.putExtra(ItemStatisticsActivity.EXTRA_ITEM_ID, itemId)
+        intent.putExtra(ItemStatisticsActivity.EXTRA_ITEM_NAME, item.name)
         startActivity(intent)
     }
 
@@ -1005,6 +890,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         return when (item.itemId) {
             R.id.action_statistics -> {
                 openStatisticsActivity()
+                true
+            }
+            R.id.action_item_statistics -> {
+                openItemStatisticsActivity()
                 true
             }
             R.id.action_notes -> {
