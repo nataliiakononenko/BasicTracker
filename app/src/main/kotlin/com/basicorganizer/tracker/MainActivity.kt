@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var notesScrollView: View
     private lateinit var notesListContainer: LinearLayout
     private lateinit var tvNoNotes: TextView
-
     private lateinit var database: TrackerDatabase
     private lateinit var itemAdapter: TrackingItemAdapter
     private lateinit var drawerAdapter: DrawerItemAdapter
@@ -107,7 +106,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesScrollView = findViewById(R.id.notes_scroll_view)
         notesListContainer = findViewById(R.id.notes_list_container)
         tvNoNotes = findViewById(R.id.tv_no_notes)
-
         rvTrackingItems.layoutManager = LinearLayoutManager(this)
 
         val navView = findViewById<NavigationView>(R.id.nav_view)
@@ -491,7 +489,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             loadItemNotes(selectedItemId!!)
             return
         }
-        
+
         // Main view: hide notes
         notesScrollView.visibility = View.GONE
         
@@ -524,28 +522,18 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         }
     }
 
-    private fun loadDrawerItems() {
-        val items = database.getAllTrackingItems()
-        occurrenceCounts.clear()
-        for (item in items) {
-            occurrenceCounts[item.id] = database.countOccurrencesForItem(item.id)
-        }
-        drawerAdapter.updateItems(items, occurrenceCounts)
-        drawerAdapter.setDefaultItemId(defaultItemId)
-    }
-
     private fun loadItemNotes(itemId: Long) {
         notesListContainer.removeAllViews()
-        val notes = database.getNotesForItem(itemId).take(5) // Show last 5 notes
-        
+        val notes = database.getNotesForItem(itemId).take(5)
+
         if (notes.isEmpty()) {
             tvNoNotes.visibility = View.VISIBLE
         } else {
             tvNoNotes.visibility = View.GONE
-            
+
             val dateFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
             val parseFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            
+
             for (note in notes) {
                 val noteView = LinearLayout(this)
                 noteView.orientation = LinearLayout.VERTICAL
@@ -562,32 +550,42 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 )
                 params.setMargins(0, 0, 0, (8 * resources.displayMetrics.density).toInt())
                 noteView.layoutParams = params
-                
+
                 val displayDate = try {
                     val date = parseFormat.parse(note.date)
                     if (date != null) dateFormat.format(date) else note.date
                 } catch (e: Exception) { note.date }
-                
+
                 val dateText = TextView(this)
                 dateText.text = displayDate
                 dateText.textSize = 12f
                 dateText.setTextColor(ContextCompat.getColor(this, R.color.sentiment_positive))
-                
+
                 val noteText = TextView(this)
                 noteText.text = note.text
                 noteText.textSize = 14f
                 noteText.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
-                
+
                 noteView.addView(dateText)
                 noteView.addView(noteText)
-                
+
                 noteView.setOnClickListener {
                     showNoteDialog(itemId, note.date)
                 }
-                
+
                 notesListContainer.addView(noteView)
             }
         }
+    }
+
+    private fun loadDrawerItems() {
+        val items = database.getAllTrackingItems()
+        occurrenceCounts.clear()
+        for (item in items) {
+            occurrenceCounts[item.id] = database.countOccurrencesForItem(item.id)
+        }
+        drawerAdapter.updateItems(items, occurrenceCounts)
+        drawerAdapter.setDefaultItemId(defaultItemId)
     }
 
     private fun showAddItemDialog(editItem: TrackingItem? = null) {
@@ -725,16 +723,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             }, 100)
         }
         dialog.show()
-    }
-
-    private fun openNotesActivity() {
-        val itemId = selectedItemId ?: return
-        val item = database.getTrackingItem(itemId) ?: return
-        
-        val intent = Intent(this, NotesActivity::class.java)
-        intent.putExtra(NotesActivity.EXTRA_ITEM_ID, itemId)
-        intent.putExtra(NotesActivity.EXTRA_ITEM_NAME, item.name)
-        startActivity(intent)
     }
 
     private fun openStatisticsActivity() {
@@ -894,10 +882,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             }
             R.id.action_item_statistics -> {
                 openItemStatisticsActivity()
-                true
-            }
-            R.id.action_notes -> {
-                openNotesActivity()
                 true
             }
             R.id.action_item_options -> {
