@@ -450,6 +450,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                         database.setEntry(itemId, dateStr, true)
                     }
                     setupMonthView()
+                    loadItemStatistics(itemId)
                 }
             }
             // Long-click shows note dialog in single item view
