@@ -1,7 +1,6 @@
 package com.basicorganizer.tracker.adapter
 
 import android.content.Context
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +22,7 @@ class TrackingItemAdapter(
     interface OnItemInteractionListener {
         fun onToggleMark(item: TrackingItem)
         fun onItemLongClick(item: TrackingItem)
+        fun onItemClick(item: TrackingItem)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,13 +34,6 @@ class TrackingItemAdapter(
         val item = items[position]
         
         holder.tvName.text = item.name
-        
-        val bgColor = when (item.sentiment) {
-            Sentiment.POSITIVE -> R.color.sentiment_positive_light
-            Sentiment.NEGATIVE -> R.color.sentiment_negative_light
-            Sentiment.NEUTRAL -> R.color.sentiment_neutral_light
-        }
-        holder.itemLayout.setBackgroundColor(ContextCompat.getColor(context, bgColor))
         
         val sentimentColor = when (item.sentiment) {
             Sentiment.POSITIVE -> R.color.sentiment_positive
@@ -57,6 +50,10 @@ class TrackingItemAdapter(
             listener.onToggleMark(item)
         }
         
+        holder.itemView.setOnClickListener {
+            listener.onItemClick(item)
+        }
+        
         holder.itemView.setOnLongClickListener {
             listener.onItemLongClick(item)
             true
@@ -65,11 +62,12 @@ class TrackingItemAdapter(
 
     private fun updateCheckState(holder: ViewHolder, isChecked: Boolean) {
         if (isChecked) {
-            holder.btnCheck.setBackgroundResource(R.drawable.circle_checked_background)
-            holder.btnCheck.setColorFilter(ContextCompat.getColor(context, R.color.white))
+            holder.btnCheck.setBackgroundResource(R.drawable.check_box_checked)
+            holder.checkIcon.visibility = View.VISIBLE
+            holder.checkIcon.setColorFilter(ContextCompat.getColor(context, R.color.text_secondary))
         } else {
-            holder.btnCheck.setBackgroundResource(R.drawable.check_unchecked_background)
-            holder.btnCheck.setColorFilter(ContextCompat.getColor(context, R.color.text_secondary))
+            holder.btnCheck.setBackgroundResource(R.drawable.check_box_border)
+            holder.checkIcon.visibility = View.GONE
         }
     }
 
@@ -84,8 +82,8 @@ class TrackingItemAdapter(
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.findViewById(R.id.tv_item_name)
-        val itemLayout: View = itemView.findViewById(R.id.item_layout)
         val sentimentIndicator: View = itemView.findViewById(R.id.sentiment_indicator)
-        val btnCheck: ImageView = itemView.findViewById(R.id.btn_mark_check)
+        val btnCheck: View = itemView.findViewById(R.id.btn_mark_check)
+        val checkIcon: ImageView = itemView.findViewById(R.id.check_icon)
     }
 }
