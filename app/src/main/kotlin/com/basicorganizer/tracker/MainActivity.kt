@@ -969,13 +969,14 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
     private fun showItemOptionsDialog(item: TrackingItem) {
         if (item.archived) {
-            // Archived items: only delete option (no edit, no set default, no archive)
-            val options = arrayOf(getString(R.string.delete))
+            // Archived items: unarchive and delete options
+            val options = arrayOf("Unarchive", getString(R.string.delete))
             AlertDialog.Builder(this)
                 .setTitle(item.name)
                 .setItems(options) { _, which ->
                     when (which) {
-                        0 -> confirmDeleteItem(item)
+                        0 -> unarchiveItem(item)
+                        1 -> confirmDeleteItem(item)
                     }
                 }
                 .show()
@@ -1021,6 +1022,17 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             .show()
     }
 
+    private fun unarchiveItem(item: TrackingItem) {
+        database.unarchiveItem(item.id)
+        if (selectedItemId == item.id) {
+            selectedItemId = null
+            supportActionBar?.title = ""
+        }
+        Toast.makeText(this, "\"${item.name}\" unarchived", Toast.LENGTH_SHORT).show()
+        invalidateOptionsMenu()
+        loadData()
+    }
+
     private fun toggleDefaultItem(item: TrackingItem) {
         val prefs = getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE)
         if (defaultItemId == item.id) {
@@ -1040,7 +1052,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private fun confirmDeleteItem(item: TrackingItem) {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete)
-            .setMessage("Delete \"${item.name}\" and all it's tracking data? \n\n Consider archiving to keep it.")
+            .setMessage("Delete \"${item.name}\" and all its tracking data?\n\nConsider archiving instead to keep the data.")
             .setPositiveButton(R.string.delete) { _, _ ->
                 database.deleteTrackingItem(item.id)
                 if (selectedItemId == item.id) {
