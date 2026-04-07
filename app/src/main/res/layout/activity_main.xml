@@ -150,17 +150,20 @@ Long-press on a day or tap + to add one."
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:paddingTop="16dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="16dp">
 
                 <TextView
                     android:id="@+id/tv_quick_add_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Quick add"
-                    android:textSize="12sp"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="10dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_tracking_items"
