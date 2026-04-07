@@ -126,7 +126,7 @@
                     android:id="@+id/tv_no_notes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Long-press on a day or tap + to add a note."
+                    android:text="Long-press on a day or tap '+' to add a note."
                     android:textSize="13sp"
                     android:textColor="@color/text_secondary"
                     android:gravity="center"

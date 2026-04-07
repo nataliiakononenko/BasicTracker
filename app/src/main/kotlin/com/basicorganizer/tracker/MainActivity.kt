@@ -1000,18 +1000,25 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun archiveItem(item: TrackingItem) {
-        database.archiveItem(item.id)
-        if (selectedItemId == item.id) {
-            selectedItemId = null
-            supportActionBar?.title = ""
-        }
-        if (defaultItemId == item.id) {
-            defaultItemId = null
-            getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE).edit().remove("defaultItemId").apply()
-        }
-        Toast.makeText(this, "\"${item.name}\" archived", Toast.LENGTH_SHORT).show()
-        invalidateOptionsMenu()
-        loadData()
+        AlertDialog.Builder(this)
+            .setTitle("Archive Item")
+            .setMessage("Archive \"${item.name}\"?\n\nYou can view archived items in the Archive section.")
+            .setPositiveButton("Archive") { _, _ ->
+                database.archiveItem(item.id)
+                if (selectedItemId == item.id) {
+                    selectedItemId = null
+                    supportActionBar?.title = ""
+                }
+                if (defaultItemId == item.id) {
+                    defaultItemId = null
+                    getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE).edit().remove("defaultItemId").apply()
+                }
+                Toast.makeText(this, "\"${item.name}\" archived", Toast.LENGTH_SHORT).show()
+                invalidateOptionsMenu()
+                loadData()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun toggleDefaultItem(item: TrackingItem) {
@@ -1033,7 +1040,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private fun confirmDeleteItem(item: TrackingItem) {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete)
-            .setMessage("Delete \"${item.name}\" and all its tracking data?")
+            .setMessage("Delete \"${item.name}\" and all it's tracking data? \n\n Consider archiving to keep it.")
             .setPositiveButton(R.string.delete) { _, _ ->
                 database.deleteTrackingItem(item.id)
                 if (selectedItemId == item.id) {
