@@ -55,11 +55,13 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var itemAdapter: TrackingItemAdapter
     private lateinit var drawerAdapter: DrawerItemAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
+    private lateinit var tvDrawerEmpty: TextView
 
     private var currentDate: Calendar = Calendar.getInstance()  // For month navigation
     private var selectedDate: Calendar = Calendar.getInstance()  // For selected day (green frame)
     private var selectedItemId: Long? = null
     private var defaultItemId: Long? = null
+    private var isArchiveView: Boolean = false
 
     private val markedItems = mutableMapOf<Long, Boolean>()
     private val occurrenceCounts = mutableMapOf<Long, Int>()
@@ -113,6 +115,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val navView = findViewById<NavigationView>(R.id.nav_view)
         val drawerRecyclerView = navView.findViewById<RecyclerView>(R.id.rv_drawer_items)
         drawerRecyclerView.layoutManager = LinearLayoutManager(this)
+        tvDrawerEmpty = navView.findViewById(R.id.tv_drawer_empty)
 
         drawerAdapter = DrawerItemAdapter(this, mutableListOf(), occurrenceCounts, this)
         drawerAdapter.setDatabase(database)
@@ -163,6 +166,24 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         navView.findViewById<View>(R.id.drawer_all_items).setOnClickListener {
             selectedItemId = null
             supportActionBar?.title = ""
+            drawerLayout.closeDrawer(GravityCompat.START)
+            invalidateOptionsMenu()
+            loadData()
+        }
+
+        navView.findViewById<View>(R.id.nav_home).setOnClickListener {
+            isArchiveView = false
+            selectedItemId = null
+            supportActionBar?.title = ""
+            drawerLayout.closeDrawer(GravityCompat.START)
+            invalidateOptionsMenu()
+            loadData()
+        }
+
+        navView.findViewById<View>(R.id.nav_archive).setOnClickListener {
+            isArchiveView = true
+            selectedItemId = null
+            supportActionBar?.title = "Archive"
             drawerLayout.closeDrawer(GravityCompat.START)
             invalidateOptionsMenu()
             loadData()
@@ -274,7 +295,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         var firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY
         if (firstDayOfWeek < 0) firstDayOfWeek += 7
 
-        val items = database.getAllTrackingItems()
+        val items = database.getActiveTrackingItems()
         val todayStr = getDateString(Calendar.getInstance())
 
         val prevMonthCal = currentDate.clone() as Calendar
@@ -505,7 +526,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesScrollView.visibility = View.GONE
         fabAddNote.visibility = View.GONE
         
-        val items = database.getAllTrackingItems()
+        val items = database.getActiveTrackingItems()
 
         val newMarkedItems = mutableMapOf<Long, Boolean>()
         val dateStr = getDateString(selectedDate)  // Use selectedDate for tracking items
@@ -620,13 +641,25 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun loadDrawerItems() {
-        val items = database.getAllTrackingItems()
+        val items = if (isArchiveView) {
+            database.getArchivedTrackingItems()
+        } else {
+            database.getActiveTrackingItems()
+        }
         occurrenceCounts.clear()
         for (item in items) {
             occurrenceCounts[item.id] = database.countOccurrencesForItem(item.id)
         }
         drawerAdapter.updateItems(items, occurrenceCounts)
         drawerAdapter.setDefaultItemId(defaultItemId)
+        drawerAdapter.setArchiveView(isArchiveView)
+        
+        // Show empty state only in archive view when no items
+        if (isArchiveView && items.isEmpty()) {
+            tvDrawerEmpty.visibility = View.VISIBLE
+        } else {
+            tvDrawerEmpty.visibility = View.GONE
+        }
     }
 
     private fun showAddItemDialog(editItem: TrackingItem? = null) {
@@ -856,20 +889,49 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun showItemOptionsDialog(item: TrackingItem) {
-        val isDefault = defaultItemId == item.id
-        val defaultOption = if (isDefault) "Unset as default" else "Set as default"
-        val options = arrayOf(getString(R.string.edit), defaultOption, getString(R.string.delete))
-        
-        AlertDialog.Builder(this)
-            .setTitle(item.name)
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> showAddItemDialog(item)
-                    1 -> toggleDefaultItem(item)
-                    2 -> confirmDeleteItem(item)
+        if (item.archived) {
+            // Archived items: only delete option (no edit, no set default, no archive)
+            val options = arrayOf(getString(R.string.delete))
+            AlertDialog.Builder(this)
+                .setTitle(item.name)
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> confirmDeleteItem(item)
+                    }
                 }
-            }
-            .show()
+                .show()
+        } else {
+            // Active items: edit, set default, archive, delete
+            val isDefault = defaultItemId == item.id
+            val defaultOption = if (isDefault) "Unset as default" else "Set as default"
+            val options = arrayOf(getString(R.string.edit), defaultOption, "Archive", getString(R.string.delete))
+            
+            AlertDialog.Builder(this)
+                .setTitle(item.name)
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> showAddItemDialog(item)
+                        1 -> toggleDefaultItem(item)
+                        2 -> archiveItem(item)
+                        3 -> confirmDeleteItem(item)
+                    }
+                }
+                .show()
+        }
+    }
+
+    private fun archiveItem(item: TrackingItem) {
+        database.archiveItem(item.id)
+        if (selectedItemId == item.id) {
+            selectedItemId = null
+            supportActionBar?.title = ""
+        }
+        if (defaultItemId == item.id) {
+            defaultItemId = null
+            getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE).edit().remove("defaultItemId").apply()
+        }
+        Toast.makeText(this, "\"${item.name}\" archived", Toast.LENGTH_SHORT).show()
+        loadData()
     }
 
     private fun toggleDefaultItem(item: TrackingItem) {

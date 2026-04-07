@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper
 class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 3
         private const val DATABASE_NAME = "TrackerDB"
 
         private const val TABLE_ITEMS = "tracking_items"
@@ -20,6 +20,7 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         private const val KEY_SENTIMENT = "sentiment"
         private const val KEY_POSITION = "position"
         private const val KEY_CREATED_AT = "created_at"
+        private const val KEY_ARCHIVED = "archived"
 
         private const val KEY_ITEM_ID = "item_id"
         private const val KEY_DATE = "date"
@@ -34,7 +35,8 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                 $KEY_NAME TEXT,
                 $KEY_SENTIMENT TEXT,
                 $KEY_POSITION INTEGER DEFAULT 0,
-                $KEY_CREATED_AT TEXT
+                $KEY_CREATED_AT TEXT,
+                $KEY_ARCHIVED INTEGER DEFAULT 0
             )
         """.trimIndent()
         db.execSQL(createItemsTable)
@@ -75,6 +77,9 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             """.trimIndent()
             db.execSQL(createNotesTable)
         }
+        if (oldVersion < 3) {
+            db.execSQL("ALTER TABLE $TABLE_ITEMS ADD COLUMN $KEY_ARCHIVED INTEGER DEFAULT 0")
+        }
     }
 
     fun addTrackingItem(item: TrackingItem): Long {
@@ -84,6 +89,7 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             put(KEY_SENTIMENT, item.sentiment.name)
             put(KEY_POSITION, item.position)
             put(KEY_CREATED_AT, item.createdAt)
+            put(KEY_ARCHIVED, if (item.archived) 1 else 0)
         }
         val id = db.insert(TABLE_ITEMS, null, values)
         db.close()
@@ -103,7 +109,8 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                     name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)),
                     sentiment = Sentiment.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(KEY_SENTIMENT))),
                     position = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_POSITION)),
-                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CREATED_AT))
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CREATED_AT)),
+                    archived = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ARCHIVED)) == 1
                 )
                 items.add(item)
             } while (cursor.moveToNext())
@@ -144,6 +151,7 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
             put(KEY_NAME, item.name)
             put(KEY_SENTIMENT, item.sentiment.name)
             put(KEY_POSITION, item.position)
+            put(KEY_ARCHIVED, if (item.archived) 1 else 0)
         }
         val result = db.update(TABLE_ITEMS, values, "$KEY_ID = ?", arrayOf(item.id.toString()))
         db.close()
@@ -154,6 +162,70 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         val db = writableDatabase
         db.delete(TABLE_ENTRIES, "$KEY_ITEM_ID = ?", arrayOf(id.toString()))
         db.delete(TABLE_ITEMS, "$KEY_ID = ?", arrayOf(id.toString()))
+        db.close()
+    }
+
+    fun getActiveTrackingItems(): List<TrackingItem> {
+        val items = mutableListOf<TrackingItem>()
+        val query = "SELECT * FROM $TABLE_ITEMS WHERE $KEY_ARCHIVED = 0 ORDER BY $KEY_POSITION ASC"
+        val db = readableDatabase
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val item = TrackingItem(
+                    id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_ID)),
+                    name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)),
+                    sentiment = Sentiment.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(KEY_SENTIMENT))),
+                    position = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_POSITION)),
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CREATED_AT)),
+                    archived = false
+                )
+                items.add(item)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return items
+    }
+
+    fun getArchivedTrackingItems(): List<TrackingItem> {
+        val items = mutableListOf<TrackingItem>()
+        val query = "SELECT * FROM $TABLE_ITEMS WHERE $KEY_ARCHIVED = 1 ORDER BY $KEY_POSITION ASC"
+        val db = readableDatabase
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val item = TrackingItem(
+                    id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_ID)),
+                    name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)),
+                    sentiment = Sentiment.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(KEY_SENTIMENT))),
+                    position = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_POSITION)),
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CREATED_AT)),
+                    archived = true
+                )
+                items.add(item)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        return items
+    }
+
+    fun archiveItem(id: Long) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(KEY_ARCHIVED, 1)
+        }
+        db.update(TABLE_ITEMS, values, "$KEY_ID = ?", arrayOf(id.toString()))
+        db.close()
+    }
+
+    fun unarchiveItem(id: Long) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(KEY_ARCHIVED, 0)
+        }
+        db.update(TABLE_ITEMS, values, "$KEY_ID = ?", arrayOf(id.toString()))
         db.close()
     }
 

@@ -23,6 +23,7 @@ class DrawerItemAdapter(
 
     private var defaultItemId: Long? = null
     private var database: com.basicorganizer.tracker.data.TrackerDatabase? = null
+    private var isArchiveView: Boolean = false
 
     fun setDatabase(db: com.basicorganizer.tracker.data.TrackerDatabase) {
         database = db
@@ -34,6 +35,11 @@ class DrawerItemAdapter(
 
     fun setDefaultItemId(itemId: Long?) {
         defaultItemId = itemId
+        notifyDataSetChanged()
+    }
+
+    fun setArchiveView(isArchive: Boolean) {
+        isArchiveView = isArchive
         notifyDataSetChanged()
     }
 
