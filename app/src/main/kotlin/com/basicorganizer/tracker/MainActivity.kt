@@ -899,8 +899,48 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun showTipsDialog() {
-        // TODO: Implement tips dialog showing how to use the app
-        Toast.makeText(this, "Tips coming soon!", Toast.LENGTH_SHORT).show()
+        val tipsMessage = """
+            📋 Getting Started
+            • Tap '+' to create your first tracking item
+            • Choose a name and sentiment (positive/negative/neutral)
+            
+            ✓ Tracking Items
+            • Tap the checkbox to mark an item as done for today
+            • Long-press a day on the calendar to mark multiple items
+            • Tap an item name to view its detailed calendar
+            
+            📅 Calendar View
+            • Green frame shows the selected day
+            • Dots under dates show which items were tracked
+            • '+X' indicates additional tracked items
+            
+            📝 Notes
+            • Long-press a day or tap '+' to add notes
+            • Notes appear in the detailed item view
+            
+            🗂️ Managing Items
+            • Tap the 3-dot menu on an item to:
+              - Edit name/sentiment
+              - Set as default view
+              - Archive (to hide without deleting)
+              - Delete permanently
+            
+            📦 Archive
+            • Access archived items from the drawer menu
+            • View past data without cluttering your main view
+            • Unarchive items to restore them
+            
+            ⚙️ Drawer Menu
+            • Drag items to reorder
+            • Tap to quickly view an item's calendar
+            • Switch between Home and Archive views
+        """.trimIndent()
+        
+        AlertDialog.Builder(this)
+            .setTitle("How to Use Basic Tracker")
+            .setMessage(tipsMessage)
+            .setPositiveButton("Got it!") { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     private fun showStatisticsDialog() {

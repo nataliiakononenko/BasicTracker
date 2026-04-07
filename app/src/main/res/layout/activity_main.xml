@@ -131,7 +131,7 @@
                     android:textColor="@color/text_secondary"
                     android:gravity="center"
                     android:visibility="gone"
-                    android:paddingTop="32dp"
+                    android:paddingTop="4dp"
                     android:paddingBottom="8dp" />
 
             </LinearLayout>
