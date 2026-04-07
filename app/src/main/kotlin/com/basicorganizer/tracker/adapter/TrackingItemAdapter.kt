@@ -41,6 +41,9 @@ class TrackingItemAdapter(
             Sentiment.NEUTRAL -> R.color.sentiment_neutral
         }
         
+        // Set sentiment indicator color
+        holder.sentimentIndicator.background.setTint(ContextCompat.getColor(context, sentimentColor))
+        
         val isMarked = markedItems[item.id] == true
         
         // Hide checkbox for archived items
@@ -101,5 +104,6 @@ class TrackingItemAdapter(
         val btnCheck: View = itemView.findViewById(R.id.btn_mark_check)
         val checkIcon: View = itemView.findViewById(R.id.check_icon)
         val spacer: View = itemView.findViewById(R.id.spacer)
+        val sentimentIndicator: View = itemView.findViewById(R.id.sentiment_indicator)
     }
 }

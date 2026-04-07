@@ -126,23 +126,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_gravity="center_vertical"
-            android:layout_marginTop="28dp"
-            android:background="@android:color/darker_gray" />
-
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/drawer_fab_add_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:src="@android:drawable/ic_input_add"
             app:backgroundTint="@color/colorPrimary"
             app:fabSize="normal" />
     </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:id="@+id/settings_tips"

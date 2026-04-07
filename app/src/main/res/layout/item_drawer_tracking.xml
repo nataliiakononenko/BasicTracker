@@ -31,22 +31,22 @@
         android:textColor="@color/text_primary" />
 
     <ImageView
-        android:id="@+id/btn_delete"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:padding="2dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:layout_marginEnd="2dp"
-        app:tint="@color/text_secondary"
-        android:contentDescription="Delete item" />
-
-    <ImageView
         android:id="@+id/btn_drag_handle"
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:padding="2dp"
         android:src="@drawable/ic_drag_handle"
+        android:layout_marginEnd="2dp"
         app:tint="@color/text_secondary"
         android:contentDescription="Drag to reorder" />
+
+    <ImageView
+        android:id="@+id/btn_delete"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:padding="2dp"
+        android:src="@android:drawable/ic_menu_delete"
+        app:tint="@color/text_secondary"
+        android:contentDescription="Delete item" />
 
 </LinearLayout>
