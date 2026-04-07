@@ -135,7 +135,8 @@ class TrackerDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                 name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)),
                 sentiment = Sentiment.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(KEY_SENTIMENT))),
                 position = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_POSITION)),
-                createdAt = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CREATED_AT))
+                createdAt = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CREATED_AT)),
+                archived = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ARCHIVED)) == 1
             )
             cursor.close()
             item

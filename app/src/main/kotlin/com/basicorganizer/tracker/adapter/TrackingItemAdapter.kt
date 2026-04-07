@@ -15,7 +15,8 @@ class TrackingItemAdapter(
     private val context: Context,
     private var items: List<TrackingItem>,
     private val markedItems: MutableMap<Long, Boolean>,
-    private val listener: OnItemInteractionListener
+    private val listener: OnItemInteractionListener,
+    private var isArchiveView: Boolean = false
 ) : RecyclerView.Adapter<TrackingItemAdapter.ViewHolder>() {
 
     interface OnItemInteractionListener {
@@ -41,17 +42,23 @@ class TrackingItemAdapter(
         }
         
         val isMarked = markedItems[item.id] == true
-        updateCheckState(holder, isMarked, sentimentColor)
+        
+        // Hide checkbox for archived items
+        if (isArchiveView) {
+            holder.btnCheck.visibility = View.GONE
+        } else {
+            holder.btnCheck.visibility = View.VISIBLE
+            updateCheckState(holder, isMarked, sentimentColor)
+            holder.btnCheck.setOnClickListener {
+                listener.onToggleMark(item)
+            }
+        }
         
         // Remove any previous click listener from itemView
         holder.itemView.setOnClickListener(null)
         holder.itemView.setOnLongClickListener(null)
         holder.itemView.isClickable = false
         holder.itemView.isLongClickable = false
-        
-        holder.btnCheck.setOnClickListener {
-            listener.onToggleMark(item)
-        }
         
         holder.tvName.setOnClickListener {
             listener.onItemClick(item)
@@ -81,10 +88,11 @@ class TrackingItemAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    fun updateData(newItems: List<TrackingItem>, newMarkedItems: Map<Long, Boolean>) {
+    fun updateData(newItems: List<TrackingItem>, newMarkedItems: Map<Long, Boolean>, archiveView: Boolean = false) {
         items = newItems
         markedItems.clear()
         markedItems.putAll(newMarkedItems)
+        isArchiveView = archiveView
         notifyDataSetChanged()
     }
 

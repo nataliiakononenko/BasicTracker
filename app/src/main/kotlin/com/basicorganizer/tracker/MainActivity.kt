@@ -175,7 +175,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             isArchiveView = false
             selectedItemId = null
             supportActionBar?.title = ""
-            drawerLayout.closeDrawer(GravityCompat.START)
             invalidateOptionsMenu()
             loadData()
         }
@@ -184,7 +183,6 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             isArchiveView = true
             selectedItemId = null
             supportActionBar?.title = "Archive"
-            drawerLayout.closeDrawer(GravityCompat.START)
             invalidateOptionsMenu()
             loadData()
         }
@@ -295,7 +293,20 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         var firstDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - Calendar.MONDAY
         if (firstDayOfWeek < 0) firstDayOfWeek += 7
 
-        val items = database.getActiveTrackingItems()
+        // Show items based on current view context
+        val items = if (isInSingleItemView()) {
+            // Single-item view: show only the selected item (whether active or archived)
+            selectedItemId?.let { itemId ->
+                val item = database.getTrackingItem(itemId)
+                if (item != null) listOf(item) else emptyList()
+            } ?: emptyList()
+        } else if (isArchiveView) {
+            // Archive main view: show only archived items
+            database.getArchivedTrackingItems()
+        } else {
+            // Home main view: show only active items
+            database.getActiveTrackingItems()
+        }
         val todayStr = getDateString(Calendar.getInstance())
 
         val prevMonthCal = currentDate.clone() as Calendar
@@ -364,8 +375,15 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             } else {
                 dayContainer.setBackgroundColor(android.graphics.Color.TRANSPARENT)
             }
+        } else if (isArchiveView) {
+            // Archive main view: only show today highlight, no selected day border
+            if (isToday) {
+                dayContainer.setBackgroundResource(R.drawable.current_day_background)
+            } else {
+                dayContainer.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+            }
         } else {
-            // Main view: show both today and selected day styling
+            // Home main view: show both today and selected day styling
             when {
                 isToday && isSelected -> {
                     dayContainer.setBackgroundResource(R.drawable.selected_today_background)
@@ -455,38 +473,58 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
         // Set click behavior based on view mode
         if (inSingleItemView) {
-            // Single item view: click toggles mark for this item on this day
-            dayView.setOnClickListener {
-                selectedItemId?.let { itemId ->
-                    val entry = database.getEntry(itemId, dateStr)
-                    if (entry?.occurred == true) {
-                        database.deleteEntry(itemId, dateStr)
-                    } else {
-                        database.setEntry(itemId, dateStr, true)
+            selectedItemId?.let { itemId ->
+                val item = database.getTrackingItem(itemId)
+                android.util.Log.d("MainActivity", "addDayView - itemId: $itemId, item: $item, archived: ${item?.archived}")
+                if (item?.archived == true) {
+                    // Archived items: read-only, consume clicks without doing anything
+                    android.util.Log.d("MainActivity", "Setting archived click handlers")
+                    dayView.setOnClickListener { 
+                        android.widget.Toast.makeText(this, "Archived item - read only", android.widget.Toast.LENGTH_SHORT).show()
                     }
-                    setupMonthView()
+                    dayView.setOnLongClickListener { 
+                        android.widget.Toast.makeText(this, "Archived item - read only", android.widget.Toast.LENGTH_SHORT).show()
+                        true 
+                    }
+                } else {
+                    android.util.Log.d("MainActivity", "Setting active click handlers")
+                    // Active items: click toggles mark for this item on this day
+                    dayView.setOnClickListener {
+                        val entry = database.getEntry(itemId, dateStr)
+                        if (entry?.occurred == true) {
+                            database.deleteEntry(itemId, dateStr)
+                        } else {
+                            database.setEntry(itemId, dateStr, true)
+                        }
+                        setupMonthView()
+                    }
+                    // Long-click shows note dialog in single item view
+                    dayView.setOnLongClickListener {
+                        showNoteDialog(itemId, dateStr)
+                        true
+                    }
                 }
-            }
-            // Long-click shows note dialog in single item view
-            dayView.setOnLongClickListener {
-                selectedItemId?.let { itemId ->
-                    showNoteDialog(itemId, dateStr)
-                }
-                true
             }
         } else {
-            // Main view: click selects day, long-click shows mark dialog
-            dayView.setOnClickListener {
-                selectedDate.timeInMillis = capturedTime
-                setupMonthView()
-                loadTrackingItems()
-            }
+            // Main view: different behavior for archive vs home
+            if (isArchiveView) {
+                // Archive main view: consume clicks without doing anything
+                dayView.setOnClickListener { /* consume click, do nothing */ }
+                dayView.setOnLongClickListener { true /* consume long-click, do nothing */ }
+            } else {
+                // Home main view: click selects day, long-click shows mark dialog
+                dayView.setOnClickListener {
+                    selectedDate.timeInMillis = capturedTime
+                    setupMonthView()
+                    loadTrackingItems()
+                }
 
-            dayView.setOnLongClickListener {
-                selectedDate.timeInMillis = capturedTime
-                setupMonthView()
-                showDayMarkDialog()
-                true
+                dayView.setOnLongClickListener {
+                    selectedDate.timeInMillis = capturedTime
+                    setupMonthView()
+                    showDayMarkDialog()
+                    true
+                }
             }
         }
 
@@ -513,10 +551,19 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             trackingScrollView.visibility = View.GONE
             fabAddItem.visibility = View.GONE
             notesScrollView.visibility = View.VISIBLE
-            fabAddNote.visibility = View.VISIBLE
-            fabAddNote.setOnClickListener {
-                val today = getDateString(Calendar.getInstance())
-                selectedItemId?.let { itemId -> showNoteDialog(itemId, today) }
+            
+            // Check if viewing archived item
+            val currentItem = selectedItemId?.let { database.getTrackingItem(it) }
+            if (currentItem?.archived == true) {
+                // Archived items: hide FAB, notes are read-only
+                fabAddNote.visibility = View.GONE
+            } else {
+                // Active items: show FAB for adding notes
+                fabAddNote.visibility = View.VISIBLE
+                fabAddNote.setOnClickListener {
+                    val today = getDateString(Calendar.getInstance())
+                    selectedItemId?.let { itemId -> showNoteDialog(itemId, today) }
+                }
             }
             loadItemNotes(selectedItemId!!)
             return
@@ -526,7 +573,11 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesScrollView.visibility = View.GONE
         fabAddNote.visibility = View.GONE
         
-        val items = database.getActiveTrackingItems()
+        val items = if (isArchiveView) {
+            database.getArchivedTrackingItems()
+        } else {
+            database.getActiveTrackingItems()
+        }
 
         val newMarkedItems = mutableMapOf<Long, Boolean>()
         val dateStr = getDateString(selectedDate)  // Use selectedDate for tracking items
@@ -547,10 +598,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             fabAddItem.visibility = View.VISIBLE
 
             if (!::itemAdapter.isInitialized) {
-                itemAdapter = TrackingItemAdapter(this, items, markedItems, this)
+                itemAdapter = TrackingItemAdapter(this, items, markedItems, this, isArchiveView)
                 rvTrackingItems.adapter = itemAdapter
             } else {
-                itemAdapter.updateData(items, newMarkedItems)
+                itemAdapter.updateData(items, newMarkedItems, isArchiveView)
             }
         }
     }
@@ -631,8 +682,12 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 noteView.addView(dateText)
                 noteView.addView(noteText)
 
-                noteView.setOnClickListener {
-                    showNoteDialog(itemId, note.date)
+                // Only allow editing notes for active items
+                val item = database.getTrackingItem(itemId)
+                if (item?.archived != true) {
+                    noteView.setOnClickListener {
+                        showNoteDialog(itemId, note.date)
+                    }
                 }
 
                 notesListContainer.addView(noteView)
