@@ -68,7 +68,12 @@ class StatisticsActivity : AppCompatActivity() {
     }
 
     private fun loadStatistics() {
-        items = database.getAllTrackingItems()
+        val isArchiveView = intent.getBooleanExtra("isArchiveView", false)
+        items = if (isArchiveView) {
+            database.getArchivedTrackingItems()
+        } else {
+            database.getActiveTrackingItems()
+        }
         
         // Check for empty state
         if (items.isEmpty()) {

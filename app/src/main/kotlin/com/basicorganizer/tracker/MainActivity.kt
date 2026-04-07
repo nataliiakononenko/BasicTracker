@@ -171,10 +171,13 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             loadData()
         }
 
+        val drawerFab = navView.findViewById<FloatingActionButton>(R.id.drawer_fab_add_item)
+        
         navView.findViewById<View>(R.id.nav_home).setOnClickListener {
             isArchiveView = false
             selectedItemId = null
             supportActionBar?.title = ""
+            drawerFab.visibility = View.VISIBLE
             invalidateOptionsMenu()
             loadData()
         }
@@ -183,6 +186,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             isArchiveView = true
             selectedItemId = null
             supportActionBar?.title = "Archive"
+            drawerFab.visibility = View.GONE
             invalidateOptionsMenu()
             loadData()
         }
@@ -589,7 +593,8 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         } else {
             emptyState.visibility = View.GONE
             trackingScrollView.visibility = View.VISIBLE
-            fabAddItem.visibility = View.VISIBLE
+            // Hide FAB in archive view - cannot add items to archive
+            fabAddItem.visibility = if (isArchiveView) View.GONE else View.VISIBLE
 
             if (!::itemAdapter.isInitialized) {
                 itemAdapter = TrackingItemAdapter(this, items, markedItems, this, isArchiveView)
@@ -849,12 +854,17 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun openStatisticsActivity() {
-        val items = database.getAllTrackingItems()
+        val items = if (isArchiveView) {
+            database.getArchivedTrackingItems()
+        } else {
+            database.getActiveTrackingItems()
+        }
         if (items.isEmpty()) {
             Toast.makeText(this, "No items to show statistics for", Toast.LENGTH_SHORT).show()
             return
         }
         val intent = Intent(this, StatisticsActivity::class.java)
+        intent.putExtra("isArchiveView", isArchiveView)
         startActivity(intent)
     }
 
