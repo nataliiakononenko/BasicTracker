@@ -404,7 +404,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val entries = if (inSingleItemView) {
             database.getEntriesForDate(dateStr).filter { it.occurred && it.trackingItemId == selectedItemId }
         } else {
-            database.getEntriesForDate(dateStr).filter { it.occurred }
+            // Main view: only show entries for items in the current view (active or archived)
+            val itemIds = items.map { it.id }.toSet()
+            database.getEntriesForDate(dateStr).filter { it.occurred && itemIds.contains(it.trackingItemId) }
         }
         
         if (inSingleItemView) {
@@ -475,19 +477,11 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         if (inSingleItemView) {
             selectedItemId?.let { itemId ->
                 val item = database.getTrackingItem(itemId)
-                android.util.Log.d("MainActivity", "addDayView - itemId: $itemId, item: $item, archived: ${item?.archived}")
                 if (item?.archived == true) {
                     // Archived items: read-only, consume clicks without doing anything
-                    android.util.Log.d("MainActivity", "Setting archived click handlers")
-                    dayView.setOnClickListener { 
-                        android.widget.Toast.makeText(this, "Archived item - read only", android.widget.Toast.LENGTH_SHORT).show()
-                    }
-                    dayView.setOnLongClickListener { 
-                        android.widget.Toast.makeText(this, "Archived item - read only", android.widget.Toast.LENGTH_SHORT).show()
-                        true 
-                    }
+                    dayView.setOnClickListener { /* consume click, do nothing */ }
+                    dayView.setOnLongClickListener { true /* consume long-click, do nothing */ }
                 } else {
-                    android.util.Log.d("MainActivity", "Setting active click handlers")
                     // Active items: click toggles mark for this item on this day
                     dayView.setOnClickListener {
                         val entry = database.getEntry(itemId, dateStr)
@@ -986,6 +980,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE).edit().remove("defaultItemId").apply()
         }
         Toast.makeText(this, "\"${item.name}\" archived", Toast.LENGTH_SHORT).show()
+        invalidateOptionsMenu()
         loadData()
     }
 
@@ -1013,8 +1008,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 database.deleteTrackingItem(item.id)
                 if (selectedItemId == item.id) {
                     selectedItemId = null
-                    supportActionBar?.title = getString(R.string.app_name)
+                    supportActionBar?.title = ""
                 }
+                invalidateOptionsMenu()
                 loadData()
                 Toast.makeText(this, "Item deleted", Toast.LENGTH_SHORT).show()
             }
