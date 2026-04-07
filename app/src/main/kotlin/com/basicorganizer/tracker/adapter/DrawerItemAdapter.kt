@@ -74,6 +74,7 @@ class DrawerItemAdapter(
         val item = items[position]
         
         holder.tvName.text = item.name
+        holder.tvName.setTextColor(ContextCompat.getColor(context, R.color.text_primary))
         
         // Set background color for default item
         if (item.id == defaultItemId) {

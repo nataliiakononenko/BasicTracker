@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var drawerAdapter: DrawerItemAdapter
     private lateinit var itemTouchHelper: ItemTouchHelper
     private lateinit var tvDrawerEmpty: TextView
+    private lateinit var tvQuickAddHeader: TextView
 
     private var currentDate: Calendar = Calendar.getInstance()  // For month navigation
     private var selectedDate: Calendar = Calendar.getInstance()  // For selected day (green frame)
@@ -110,6 +111,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesListContainer = findViewById(R.id.notes_list_container)
         tvNoNotes = findViewById(R.id.tv_no_notes)
         fabAddNote = findViewById(R.id.fab_add_note)
+        tvQuickAddHeader = findViewById(R.id.tv_quick_add_header)
         rvTrackingItems.layoutManager = LinearLayoutManager(this)
 
         val navView = findViewById<NavigationView>(R.id.nav_view)
@@ -570,6 +572,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         // Main view: hide notes
         notesScrollView.visibility = View.GONE
         fabAddNote.visibility = View.GONE
+        
+        // Hide header in archive view
+        tvQuickAddHeader.visibility = if (isArchiveView) View.GONE else View.VISIBLE
         
         val items = if (isArchiveView) {
             database.getArchivedTrackingItems()
