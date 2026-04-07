@@ -573,8 +573,22 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesScrollView.visibility = View.GONE
         fabAddNote.visibility = View.GONE
         
-        // Hide header in archive view
-        tvQuickAddHeader.visibility = if (isArchiveView) View.GONE else View.VISIBLE
+        // Hide header in archive view, update text based on selected date
+        if (isArchiveView) {
+            tvQuickAddHeader.visibility = View.GONE
+        } else {
+            tvQuickAddHeader.visibility = View.VISIBLE
+            // Show "Today" if selected date is today, otherwise show the date
+            val today = Calendar.getInstance()
+            val isToday = selectedDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                          selectedDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            if (isToday) {
+                tvQuickAddHeader.text = "Today"
+            } else {
+                val dateFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
+                tvQuickAddHeader.text = dateFormat.format(selectedDate.time)
+            }
+        }
         
         val items = if (isArchiveView) {
             database.getArchivedTrackingItems()
