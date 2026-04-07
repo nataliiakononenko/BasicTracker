@@ -324,7 +324,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val dotsContainer = dayView.findViewById<LinearLayout>(R.id.dots_container)
         val tvMoreCount = dayView.findViewById<TextView>(R.id.tv_more_count)
         val dayContainer = dayView.findViewById<LinearLayout>(R.id.day_container)
-        val checkOverlay = dayView.findViewById<android.widget.ImageView>(R.id.check_overlay)
+        val checkOverlay = dayView.findViewById<View>(R.id.check_overlay)
         val noteIndicator = dayView.findViewById<android.widget.ImageView>(R.id.note_indicator)
 
         tvDay.text = day.toString()
@@ -380,7 +380,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                         Sentiment.NEGATIVE -> R.color.sentiment_negative
                         Sentiment.NEUTRAL -> R.color.sentiment_neutral
                     }
-                    checkOverlay.setColorFilter(ContextCompat.getColor(this, color))
+                    checkOverlay.background.setTint(ContextCompat.getColor(this, color))
                     checkOverlay.visibility = View.VISIBLE
                 }
             } else {

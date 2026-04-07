@@ -38,12 +38,12 @@
             android:visibility="invisible" />
     </LinearLayout>
 
-    <ImageView
+    <View
         android:id="@+id/check_overlay"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="center"
-        android:src="@drawable/ic_check"
+        android:background="@drawable/circle_indicator"
         android:visibility="gone" />
 
     <ImageView
