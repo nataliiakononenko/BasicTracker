@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private lateinit var notesScrollView: View
     private lateinit var notesListContainer: LinearLayout
     private lateinit var tvNoNotes: TextView
+    private lateinit var tvNotesHeader: TextView
     private lateinit var fabAddNote: com.google.android.material.floatingactionbutton.FloatingActionButton
     private lateinit var database: TrackerDatabase
     private lateinit var itemAdapter: TrackingItemAdapter
@@ -110,6 +111,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesScrollView = findViewById(R.id.notes_scroll_view)
         notesListContainer = findViewById(R.id.notes_list_container)
         tvNoNotes = findViewById(R.id.tv_no_notes)
+        tvNotesHeader = findViewById(R.id.tv_notes_header)
         fabAddNote = findViewById(R.id.fab_add_note)
         tvQuickAddHeader = findViewById(R.id.tv_quick_add_header)
         rvTrackingItems.layoutManager = LinearLayoutManager(this)
@@ -645,9 +647,20 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             .filter { it.date >= rangeStart && it.date <= rangeEnd }
             .sortedBy { it.date }
 
+        val item = database.getTrackingItem(itemId)
+        val isArchived = item?.archived == true
+
         if (notes.isEmpty()) {
-            tvNoNotes.visibility = View.VISIBLE
+            // For archived items with no notes, hide both header and "no notes" text
+            if (isArchived) {
+                tvNotesHeader.visibility = View.GONE
+                tvNoNotes.visibility = View.GONE
+            } else {
+                tvNotesHeader.visibility = View.VISIBLE
+                tvNoNotes.visibility = View.VISIBLE
+            }
         } else {
+            tvNotesHeader.visibility = View.VISIBLE
             tvNoNotes.visibility = View.GONE
 
             val dateFormat = SimpleDateFormat("d MMM yyyy", Locale.getDefault())

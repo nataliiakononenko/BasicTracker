@@ -107,6 +107,7 @@
                 android:paddingBottom="88dp">
 
                 <TextView
+                    android:id="@+id/tv_notes_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Notes"
