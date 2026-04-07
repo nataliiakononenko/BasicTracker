@@ -43,17 +43,28 @@ class TrackingItemAdapter(
         val isMarked = markedItems[item.id] == true
         updateCheckState(holder, isMarked, sentimentColor)
         
+        // Remove any previous click listener from itemView
+        holder.itemView.setOnClickListener(null)
+        holder.itemView.setOnLongClickListener(null)
+        holder.itemView.isClickable = false
+        holder.itemView.isLongClickable = false
+        
         holder.btnCheck.setOnClickListener {
             listener.onToggleMark(item)
         }
         
-        holder.itemView.setOnClickListener {
+        holder.tvName.setOnClickListener {
             listener.onItemClick(item)
         }
         
-        holder.itemView.setOnLongClickListener {
+        holder.tvName.setOnLongClickListener {
             listener.onItemLongClick(item)
             true
+        }
+        
+        // Spacer consumes clicks without doing anything
+        holder.spacer.setOnClickListener {
+            // Do nothing - just consume the click
         }
     }
 
@@ -81,5 +92,6 @@ class TrackingItemAdapter(
         val tvName: TextView = itemView.findViewById(R.id.tv_item_name)
         val btnCheck: View = itemView.findViewById(R.id.btn_mark_check)
         val checkIcon: View = itemView.findViewById(R.id.check_icon)
+        val spacer: View = itemView.findViewById(R.id.spacer)
     }
 }

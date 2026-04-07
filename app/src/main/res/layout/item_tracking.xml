@@ -12,15 +12,24 @@
     android:paddingBottom="8dp"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
+    android:clickable="false"
+    android:focusable="false"
     android:background="@drawable/tracking_item_border">
 
     <TextView
         android:id="@+id/tv_item_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:textSize="16sp"
         android:textColor="@color/text_primary" />
+
+    <View
+        android:id="@+id/spacer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true" />
 
     <FrameLayout
         android:id="@+id/btn_mark_check"
