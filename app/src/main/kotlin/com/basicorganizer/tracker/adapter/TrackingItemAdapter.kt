@@ -46,12 +46,16 @@ class TrackingItemAdapter(
         
         val isMarked = markedItems[item.id] == true
         
-        // Hide checkbox for archived items
+        // Show checkbox for all items
+        holder.btnCheck.visibility = View.VISIBLE
+        updateCheckState(holder, isMarked, sentimentColor)
+        
+        // Only make clickable for active items
         if (isArchiveView) {
-            holder.btnCheck.visibility = View.GONE
+            holder.btnCheck.setOnClickListener(null)
+            holder.btnCheck.isClickable = false
         } else {
-            holder.btnCheck.visibility = View.VISIBLE
-            updateCheckState(holder, isMarked, sentimentColor)
+            holder.btnCheck.isClickable = true
             holder.btnCheck.setOnClickListener {
                 listener.onToggleMark(item)
             }

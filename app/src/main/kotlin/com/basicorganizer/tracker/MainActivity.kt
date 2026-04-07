@@ -381,15 +381,8 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             } else {
                 dayContainer.setBackgroundColor(android.graphics.Color.TRANSPARENT)
             }
-        } else if (isArchiveView) {
-            // Archive main view: only show today highlight, no selected day border
-            if (isToday) {
-                dayContainer.setBackgroundResource(R.drawable.current_day_background)
-            } else {
-                dayContainer.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-            }
         } else {
-            // Home main view: show both today and selected day styling
+            // Main view (both home and archive): show both today and selected day styling
             when {
                 isToday && isSelected -> {
                     dayContainer.setBackgroundResource(R.drawable.selected_today_background)
@@ -506,19 +499,19 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 }
             }
         } else {
-            // Main view: different behavior for archive vs home
-            if (isArchiveView) {
-                // Archive main view: consume clicks without doing anything
-                dayView.setOnClickListener { /* consume click, do nothing */ }
-                dayView.setOnLongClickListener { true /* consume long-click, do nothing */ }
-            } else {
-                // Home main view: click selects day, long-click shows mark dialog
-                dayView.setOnClickListener {
-                    selectedDate.timeInMillis = capturedTime
-                    setupMonthView()
-                    loadTrackingItems()
-                }
+            // Main view: click selects day for both home and archive
+            dayView.setOnClickListener {
+                selectedDate.timeInMillis = capturedTime
+                setupMonthView()
+                loadTrackingItems()
+            }
 
+            // Long-click behavior differs
+            if (isArchiveView) {
+                // Archive: consume long-click without action
+                dayView.setOnLongClickListener { true }
+            } else {
+                // Home: long-click shows mark dialog
                 dayView.setOnLongClickListener {
                     selectedDate.timeInMillis = capturedTime
                     setupMonthView()
@@ -573,21 +566,16 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         notesScrollView.visibility = View.GONE
         fabAddNote.visibility = View.GONE
         
-        // Hide header in archive view, update text based on selected date
-        if (isArchiveView) {
-            tvQuickAddHeader.visibility = View.GONE
+        // Update header text based on selected date
+        tvQuickAddHeader.visibility = View.VISIBLE
+        val today = Calendar.getInstance()
+        val isToday = selectedDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                      selectedDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+        if (isToday) {
+            tvQuickAddHeader.text = "Today"
         } else {
-            tvQuickAddHeader.visibility = View.VISIBLE
-            // Show "Today" if selected date is today, otherwise show the date
-            val today = Calendar.getInstance()
-            val isToday = selectedDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-                          selectedDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
-            if (isToday) {
-                tvQuickAddHeader.text = "Today"
-            } else {
-                val dateFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
-                tvQuickAddHeader.text = dateFormat.format(selectedDate.time)
-            }
+            val dateFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
+            tvQuickAddHeader.text = dateFormat.format(selectedDate.time)
         }
         
         val items = if (isArchiveView) {
