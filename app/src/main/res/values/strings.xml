@@ -65,6 +65,10 @@
     <string name="times_format">%1$d times</string>
     <string name="days_format">%1$d days</string>
     <string name="last_30_days_total">Last 30 days: %1$d  •  Total: %2$d</string>
+    <string name="correlation_graph">Correlation Graph</string>
+    <string name="graph_subtitle">7-day rolling window • Last 30 days</string>
+    <string name="toggle_items_to_compare">Toggle items to compare</string>
+    <string name="summary_last_30_days">Summary (Last 30 Days)</string>
     
     <!-- Drawer menu -->
     <string name="tips">Tips</string>

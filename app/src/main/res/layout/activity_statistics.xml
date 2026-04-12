@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
-            app:title="Statistics"
+            app:title="@string/statistics"
             app:titleTextColor="@color/white"
             app:navigationIcon="@drawable/ic_arrow_left" />
 
@@ -34,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No data yet"
+            android:text="@string/no_statistics_data"
             android:textSize="18sp"
             android:textColor="@color/text_secondary" />
 
@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Start tracking items to see statistics"
+            android:text="@string/start_tracking"
             android:textSize="14sp"
             android:textColor="@color/text_secondary"
             android:gravity="center" />
@@ -64,7 +64,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Correlation Graph"
+                android:text="@string/correlation_graph"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
@@ -73,7 +73,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="7-day rolling window • Last 30 days"
+                android:text="@string/graph_subtitle"
                 android:textSize="12sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="12dp" />
@@ -88,7 +88,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Toggle items to compare"
+                android:text="@string/toggle_items_to_compare"
                 android:textSize="12sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="12dp"
@@ -110,7 +110,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Summary (Last 30 Days)"
+                android:text="@string/summary_last_30_days"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"

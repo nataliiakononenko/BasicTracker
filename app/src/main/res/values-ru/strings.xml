@@ -65,6 +65,10 @@
     <string name="times_format">%1$d раз</string>
     <string name="days_format">%1$d дней</string>
     <string name="last_30_days_total">Последние 30 дней: %1$d  •  Всего: %2$d</string>
+    <string name="correlation_graph">График корреляции</string>
+    <string name="graph_subtitle">7-дневное скользящее окно • Последние 30 дней</string>
+    <string name="toggle_items_to_compare">Переключайте элементы для сравнения</string>
+    <string name="summary_last_30_days">Сводка (Последние 30 дней)</string>
     
     <!-- Drawer menu -->
     <string name="tips">Советы</string>

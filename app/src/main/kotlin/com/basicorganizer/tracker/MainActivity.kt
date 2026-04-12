@@ -263,8 +263,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun updateDateDisplay() {
-        val monthYearFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
-        tvMonthYear.text = monthYearFormat.format(currentDate.time)
+        val monthYearFormat = SimpleDateFormat("LLLL yyyy", Locale.getDefault())
+        val formatted = monthYearFormat.format(currentDate.time)
+        // Capitalize first letter for proper display
+        tvMonthYear.text = formatted.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
         setupWeekDayHeaders()
         setupMonthView()
@@ -859,7 +861,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val displayDate = dateFormat.format(calendar.time)
 
         val dialog = AlertDialog.Builder(this)
-            .setTitle("Note for $displayDate")
+            .setTitle(getString(R.string.note_for_date, displayDate))
             .setView(dialogView)
             .setPositiveButton(R.string.save) { _, _ ->
                 val noteText = etNote.text.toString().trim()

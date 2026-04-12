@@ -65,6 +65,10 @@
     <string name="times_format">%1$d gange</string>
     <string name="days_format">%1$d dage</string>
     <string name="last_30_days_total">Sidste 30 dage: %1$d  •  Total: %2$d</string>
+    <string name="correlation_graph">Korrelationsdiagram</string>
+    <string name="graph_subtitle">7-dages glidende vindue • Sidste 30 dage</string>
+    <string name="toggle_items_to_compare">Skift elementer for at sammenligne</string>
+    <string name="summary_last_30_days">Oversigt (Sidste 30 dage)</string>
     
     <!-- Drawer menu -->
     <string name="tips">Tips</string>

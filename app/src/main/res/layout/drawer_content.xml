@@ -59,7 +59,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Home"
+                android:text="@string/home"
                 android:textSize="16sp"
                 android:textColor="@color/text_primary"
                 android:layout_marginStart="16dp" />
@@ -88,7 +88,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Archive"
+                android:text="@string/archive"
                 android:textSize="16sp"
                 android:textColor="@color/text_primary"
                 android:layout_marginStart="16dp" />
