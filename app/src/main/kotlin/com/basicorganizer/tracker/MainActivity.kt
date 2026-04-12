@@ -587,7 +587,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             tvQuickAddHeader.text = getString(R.string.today)
         } else {
             val dateFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
-            tvQuickAddHeader.text = dateFormat.format(selectedDate.time)
+            val formatted = dateFormat.format(selectedDate.time)
+            // Capitalize first letter for proper display
+            tvQuickAddHeader.text = formatted.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         }
         
         val items = if (isArchiveView) {
