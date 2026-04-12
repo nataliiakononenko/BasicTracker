@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">Basic Tracker</string>
+    <string name="app_name_full">Basic Tracker</string>
+    
+    <!-- Navigation -->
+    <string name="navigation_drawer_open">Відкрити навігаційне меню</string>
+    <string name="navigation_drawer_close">Закрити навігаційне меню</string>
+    <string name="home">Головна</string>
+    <string name="archive">Архів</string>
+    
+    <!-- Main view -->
+    <string name="no_items_to_track">Поки що немає елементів для відстеження</string>
+    <string name="add_item">Додати елемент для відстеження</string>
+    <string name="today">Сьогодні</string>
+    
+    <!-- Item management -->
+    <string name="item_name">Назва елемента</string>
+    <string name="item_name_hint">наприклад, Біг, Мігрень, Читання…</string>
+    <string name="sentiment_positive">Позитивний</string>
+    <string name="sentiment_negative">Негативний</string>
+    <string name="sentiment_neutral">Нейтральний</string>
+    
+    <!-- Actions -->
+    <string name="delete">Видалити</string>
+    <string name="cancel">Скасувати</string>
+    <string name="save">Зберегти</string>
+    <string name="edit">Редагувати</string>
+    <string name="archive_action">Архівувати</string>
+    <string name="unarchive">Розархівувати</string>
+    <string name="set_as_default">Встановити за замовчуванням</string>
+    <string name="unset_as_default">Скасувати за замовчуванням</string>
+    
+    <!-- Dialogs -->
+    <string name="archive_item_title">Архівувати елемент</string>
+    <string name="archive_item_message">Архівувати \"%1$s\"?\n\nВи можете переглянути архівовані елементи в розділі Архів.</string>
+    <string name="delete_item_message">Видалити \"%1$s\" та всі дані відстеження?\n\nРозгляньте можливість архівування, щоб зберегти дані.</string>
+    <string name="item_archived">\"%1$s\" архівовано</string>
+    <string name="item_unarchived">\"%1$s\" розархівовано</string>
+    <string name="item_deleted">Елемент видалено</string>
+    <string name="default_view_set">\"%1$s\" встановлено як вигляд за замовчуванням</string>
+    <string name="default_view_unset">Вигляд за замовчуванням скасовано</string>
+    
+    <!-- Notes -->
+    <string name="notes">Нотатки</string>
+    <string name="no_notes_yet">Поки що немає нотаток</string>
+    <string name="no_notes_instruction">Довге натискання на день або натисніть \'+\', щоб додати нотатку.</string>
+    <string name="no_notes_long_press">Довге натискання на день, щоб додати нотатку</string>
+    <string name="note_for_date">Нотатка для %1$s</string>
+    
+    <!-- Statistics -->
+    <string name="statistics">Статистика</string>
+    <string name="statistics_title">Статистика - %1$s</string>
+    <string name="no_statistics_data">Поки що немає даних</string>
+    <string name="start_tracking">Почніть відстеження, щоб побачити статистику</string>
+    <string name="no_items_for_statistics">Немає елементів для показу статистики</string>
+    <string name="monthly_overview">Огляд за місяць</string>
+    <string name="this_month">Цього місяця</string>
+    <string name="total">Всього</string>
+    <string name="avg_week_this_month">Серед./тиждень (цей місяць)</string>
+    <string name="avg_week_overall">Серед./тиждень (загалом)</string>
+    <string name="current_streak">Поточна серія</string>
+    <string name="longest_streak">Найдовша серія</string>
+    <string name="times_format">%1$d разів</string>
+    <string name="days_format">%1$d днів</string>
+    <string name="last_30_days_total">Останні 30 днів: %1$d  •  Всього: %2$d</string>
+    
+    <!-- Drawer menu -->
+    <string name="tips">Поради</string>
+    <string name="report_bug">Повідомити про помилку</string>
+    <string name="get_organized">Організуйтеся!</string>
+    <string name="no_email_app">Не знайдено додаток електронної пошти</string>
+    
+    <!-- Tips dialog -->
+    <string name="tips_title">Як користуватися Basic Tracker</string>
+    <string name="tips_got_it">Зрозуміло!</string>
+    <string name="tips_content">📋 Початок роботи\n• Натисніть \'+\', щоб створити перший елемент відстеження\n• Виберіть назву та настрій (позитивний/негативний/нейтральний)\n\n✓ Відстеження елементів\n• Натисніть прапорець, щоб позначити елемент як виконаний сьогодні\n• Довге натискання на день у календарі, щоб позначити кілька елементів\n• Натисніть назву елемента, щоб переглянути його детальний календар\n\n📅 Вигляд календаря\n• Зелена рамка показує вибраний день\n• Точки під датами показують, які елементи відстежувалися\n• \'+X\' вказує на додаткові відстежувані елементи\n\n📝 Нотатки\n• Довге натискання на день або натисніть \'+\', щоб додати нотатки\n• Нотатки з\'являються в детальному вигляді елемента\n\n🗂️ Керування елементами\n• Натисніть меню з 3 крапками на елементі, щоб:\n  - Редагувати назву/настрій\n  - Встановити як вигляд за замовчуванням\n  - Архівувати (сховати без видалення)\n  - Видалити назавжди\n\n📦 Архів\n• Доступ до архівованих елементів з меню\n• Перегляд минулих даних без захаращення основного вигляду\n• Розархівування елементів для відновлення\n\n⚙️ Меню\n• Перетягуйте елементи для зміни порядку\n• Натисніть для швидкого перегляду календаря елемента\n• Перемикайтеся між виглядами Головна та Архів</string>
+    
+    <!-- Week days (short) -->
+    <string name="monday_short">ПН</string>
+    <string name="tuesday_short">ВТ</string>
+    <string name="wednesday_short">СР</string>
+    <string name="thursday_short">ЧТ</string>
+    <string name="friday_short">ПТ</string>
+    <string name="saturday_short">СБ</string>
+    <string name="sunday_short">НД</string>
+    
+    <!-- Misc -->
+    <string name="notes_title">Нотатки - %1$s</string>
+    <string name="empty_drawer">Поки що немає елементів</string>
+</resources>

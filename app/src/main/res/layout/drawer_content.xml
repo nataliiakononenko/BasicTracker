@@ -166,7 +166,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tips"
+            android:text="@string/tips"
             android:textSize="16sp"
             android:textColor="@color/text_primary"
             android:layout_marginStart="16dp" />
@@ -195,7 +195,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Report a bug"
+            android:text="@string/report_bug"
             android:textSize="16sp"
             android:textColor="@color/text_primary"
             android:layout_marginStart="16dp" />
@@ -224,7 +224,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get Organized!"
+            android:text="@string/get_organized"
             android:textSize="16sp"
             android:textColor="@color/text_primary"
             android:layout_marginStart="16dp" />

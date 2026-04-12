@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">Basic Tracker</string>
+    <string name="app_name_full">Basic Tracker</string>
+    
+    <!-- Navigation -->
+    <string name="navigation_drawer_open">Открыть меню навигации</string>
+    <string name="navigation_drawer_close">Закрыть меню навигации</string>
+    <string name="home">Главная</string>
+    <string name="archive">Архив</string>
+    
+    <!-- Main view -->
+    <string name="no_items_to_track">Пока нет элементов для отслеживания</string>
+    <string name="add_item">Добавить элемент для отслеживания</string>
+    <string name="today">Сегодня</string>
+    
+    <!-- Item management -->
+    <string name="item_name">Название элемента</string>
+    <string name="item_name_hint">напр., Бег, Мигрень, Чтение…</string>
+    <string name="sentiment_positive">Позитивный</string>
+    <string name="sentiment_negative">Негативный</string>
+    <string name="sentiment_neutral">Нейтральный</string>
+    
+    <!-- Actions -->
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="edit">Редактировать</string>
+    <string name="archive_action">Архивировать</string>
+    <string name="unarchive">Разархивировать</string>
+    <string name="set_as_default">Установить по умолчанию</string>
+    <string name="unset_as_default">Отменить по умолчанию</string>
+    
+    <!-- Dialogs -->
+    <string name="archive_item_title">Архивировать элемент</string>
+    <string name="archive_item_message">Архивировать \"%1$s\"?\n\nВы можете просмотреть архивированные элементы в разделе Архив.</string>
+    <string name="delete_item_message">Удалить \"%1$s\" и все данные отслеживания?\n\nРассмотрите возможность архивирования, чтобы сохранить данные.</string>
+    <string name="item_archived">\"%1$s\" архивирован</string>
+    <string name="item_unarchived">\"%1$s\" разархивирован</string>
+    <string name="item_deleted">Элемент удален</string>
+    <string name="default_view_set">\"%1$s\" установлен как вид по умолчанию</string>
+    <string name="default_view_unset">Вид по умолчанию отменен</string>
+    
+    <!-- Notes -->
+    <string name="notes">Заметки</string>
+    <string name="no_notes_yet">Пока нет заметок</string>
+    <string name="no_notes_instruction">Долгое нажатие на день или нажмите \'+\', чтобы добавить заметку.</string>
+    <string name="no_notes_long_press">Долгое нажатие на день, чтобы добавить заметку</string>
+    <string name="note_for_date">Заметка для %1$s</string>
+    
+    <!-- Statistics -->
+    <string name="statistics">Статистика</string>
+    <string name="statistics_title">Статистика - %1$s</string>
+    <string name="no_statistics_data">Пока нет данных</string>
+    <string name="start_tracking">Начните отслеживание, чтобы увидеть статистику</string>
+    <string name="no_items_for_statistics">Нет элементов для показа статистики</string>
+    <string name="monthly_overview">Обзор за месяц</string>
+    <string name="this_month">Этот месяц</string>
+    <string name="total">Всего</string>
+    <string name="avg_week_this_month">Сред./неделя (этот месяц)</string>
+    <string name="avg_week_overall">Сред./неделя (общее)</string>
+    <string name="current_streak">Текущая серия</string>
+    <string name="longest_streak">Самая длинная серия</string>
+    <string name="times_format">%1$d раз</string>
+    <string name="days_format">%1$d дней</string>
+    <string name="last_30_days_total">Последние 30 дней: %1$d  •  Всего: %2$d</string>
+    
+    <!-- Drawer menu -->
+    <string name="tips">Советы</string>
+    <string name="report_bug">Сообщить об ошибке</string>
+    <string name="get_organized">Организуйтесь!</string>
+    <string name="no_email_app">Приложение электронной почты не найдено</string>
+    
+    <!-- Tips dialog -->
+    <string name="tips_title">Как использовать Basic Tracker</string>
+    <string name="tips_got_it">Понятно!</string>
+    <string name="tips_content">📋 Начало работы\n• Нажмите \'+\', чтобы создать первый элемент отслеживания\n• Выберите название и настроение (позитивное/негативное/нейтральное)\n\n✓ Элементы отслеживания\n• Нажмите флажок, чтобы отметить элемент как выполненный сегодня\n• Долгое нажатие на день в календаре, чтобы отметить несколько элементов\n• Нажмите название элемента, чтобы просмотреть его подробный календарь\n\n📅 Вид календаря\n• Зеленая рамка показывает выбранный день\n• Точки под датами показывают, какие элементы отслеживались\n• \'+X\' указывает на дополнительные отслеживаемые элементы\n\n📝 Заметки\n• Долгое нажатие на день или нажмите \'+\', чтобы добавить заметки\n• Заметки появляются в подробном виде элемента\n\n🗂️ Управление элементами\n• Нажмите меню с 3 точками на элементе, чтобы:\n  - Редактировать название/настроение\n  - Установить как вид по умолчанию\n  - Архивировать (скрыть без удаления)\n  - Удалить навсегда\n\n📦 Архив\n• Доступ к архивированным элементам из меню\n• Просмотр прошлых данных без загромождения основного вида\n• Разархивирование элементов для восстановления\n\n⚙️ Меню\n• Перетаскивайте элементы для изменения порядка\n• Нажмите для быстрого просмотра календаря элемента\n• Переключайтесь между видами Главная и Архив</string>
+    
+    <!-- Week days (short) -->
+    <string name="monday_short">ПН</string>
+    <string name="tuesday_short">ВТ</string>
+    <string name="wednesday_short">СР</string>
+    <string name="thursday_short">ЧТ</string>
+    <string name="friday_short">ПТ</string>
+    <string name="saturday_short">СБ</string>
+    <string name="sunday_short">ВС</string>
+    
+    <!-- Misc -->
+    <string name="notes_title">Заметки - %1$s</string>
+    <string name="empty_drawer">Пока нет элементов</string>
+</resources>

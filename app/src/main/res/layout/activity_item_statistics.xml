@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Monthly Overview"
+                android:text="@string/monthly_overview"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
@@ -87,7 +87,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="This Month"
+                        android:text="@string/this_month"
                         android:textSize="11sp"
                         android:textColor="@color/text_secondary" />
 
@@ -114,7 +114,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total"
+                        android:text="@string/total"
                         android:textSize="11sp"
                         android:textColor="@color/text_secondary" />
 
@@ -149,7 +149,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Avg/Week (This Month)"
+                        android:text="@string/avg_week_this_month"
                         android:textSize="11sp"
                         android:textColor="@color/text_secondary" />
 
@@ -176,7 +176,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Avg/Week (Overall)"
+                        android:text="@string/avg_week_overall"
                         android:textSize="11sp"
                         android:textColor="@color/text_secondary" />
 
@@ -210,7 +210,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Current Streak"
+                        android:text="@string/current_streak"
                         android:textSize="11sp"
                         android:textColor="@color/text_secondary" />
 
@@ -237,7 +237,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Longest Streak"
+                        android:text="@string/longest_streak"
                         android:textSize="11sp"
                         android:textColor="@color/text_secondary" />
 

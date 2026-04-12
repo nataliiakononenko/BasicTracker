@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">Basic Tracker</string>
+    <string name="app_name_full">Basic Tracker</string>
+    
+    <!-- Navigation -->
+    <string name="navigation_drawer_open">Åbn navigationsmenu</string>
+    <string name="navigation_drawer_close">Luk navigationsmenu</string>
+    <string name="home">Hjem</string>
+    <string name="archive">Arkiv</string>
+    
+    <!-- Main view -->
+    <string name="no_items_to_track">Ingen elementer at spore endnu</string>
+    <string name="add_item">Tilføj element at spore</string>
+    <string name="today">I dag</string>
+    
+    <!-- Item management -->
+    <string name="item_name">Elementnavn</string>
+    <string name="item_name_hint">f.eks. Løb, Migræne, Læsning…</string>
+    <string name="sentiment_positive">Positiv</string>
+    <string name="sentiment_negative">Negativ</string>
+    <string name="sentiment_neutral">Neutral</string>
+    
+    <!-- Actions -->
+    <string name="delete">Slet</string>
+    <string name="cancel">Annuller</string>
+    <string name="save">Gem</string>
+    <string name="edit">Rediger</string>
+    <string name="archive_action">Arkiver</string>
+    <string name="unarchive">Gendan fra arkiv</string>
+    <string name="set_as_default">Indstil som standard</string>
+    <string name="unset_as_default">Fjern som standard</string>
+    
+    <!-- Dialogs -->
+    <string name="archive_item_title">Arkiver element</string>
+    <string name="archive_item_message">Arkivere \"%1$s\"?\n\nDu kan se arkiverede elementer i Arkiv-sektionen.</string>
+    <string name="delete_item_message">Slette \"%1$s\" og alle sporingsdata?\n\nOvervej at arkivere i stedet for at beholde dataene.</string>
+    <string name="item_archived">\"%1$s\" arkiveret</string>
+    <string name="item_unarchived">\"%1$s\" gendannet fra arkiv</string>
+    <string name="item_deleted">Element slettet</string>
+    <string name="default_view_set">\"%1$s\" indstillet som standardvisning</string>
+    <string name="default_view_unset">Standardvisning fjernet</string>
+    
+    <!-- Notes -->
+    <string name="notes">Noter</string>
+    <string name="no_notes_yet">Ingen noter endnu</string>
+    <string name="no_notes_instruction">Tryk længe på en dag eller tryk på \'+\' for at tilføje en note.</string>
+    <string name="no_notes_long_press">Tryk længe på en dag for at tilføje en note</string>
+    <string name="note_for_date">Note for %1$s</string>
+    
+    <!-- Statistics -->
+    <string name="statistics">Statistik</string>
+    <string name="statistics_title">Statistik - %1$s</string>
+    <string name="no_statistics_data">Ingen data endnu</string>
+    <string name="start_tracking">Start sporing for at se statistik</string>
+    <string name="no_items_for_statistics">Ingen elementer at vise statistik for</string>
+    <string name="monthly_overview">Månedlig oversigt</string>
+    <string name="this_month">Denne måned</string>
+    <string name="total">Total</string>
+    <string name="avg_week_this_month">Gns./uge (denne måned)</string>
+    <string name="avg_week_overall">Gns./uge (samlet)</string>
+    <string name="current_streak">Nuværende stribe</string>
+    <string name="longest_streak">Længste stribe</string>
+    <string name="times_format">%1$d gange</string>
+    <string name="days_format">%1$d dage</string>
+    <string name="last_30_days_total">Sidste 30 dage: %1$d  •  Total: %2$d</string>
+    
+    <!-- Drawer menu -->
+    <string name="tips">Tips</string>
+    <string name="report_bug">Rapporter en fejl</string>
+    <string name="get_organized">Bliv organiseret!</string>
+    <string name="no_email_app">Ingen e-mail-app fundet</string>
+    
+    <!-- Tips dialog -->
+    <string name="tips_title">Sådan bruger du Basic Tracker</string>
+    <string name="tips_got_it">Forstået!</string>
+    <string name="tips_content">📋 Kom i gang\n• Tryk på \'+\' for at oprette dit første sporingselement\n• Vælg et navn og stemning (positiv/negativ/neutral)\n\n✓ Sporingselementer\n• Tryk på afkrydsningsfeltet for at markere et element som udført i dag\n• Tryk længe på en dag i kalenderen for at markere flere elementer\n• Tryk på et elementnavn for at se dets detaljerede kalender\n\n📅 Kalendervisning\n• Grøn ramme viser den valgte dag\n• Prikker under datoer viser hvilke elementer der blev sporet\n• \'+X\' angiver yderligere sporede elementer\n\n📝 Noter\n• Tryk længe på en dag eller tryk på \'+\' for at tilføje noter\n• Noter vises i den detaljerede elementvisning\n\n🗂️ Administrer elementer\n• Tryk på 3-prikkers menuen på et element for at:\n  - Redigere navn/stemning\n  - Indstille som standardvisning\n  - Arkivere (skjule uden at slette)\n  - Slette permanent\n\n📦 Arkiv\n• Få adgang til arkiverede elementer fra menuen\n• Se tidligere data uden at rode hovedvisningen til\n• Gendan elementer fra arkiv\n\n⚙️ Menu\n• Træk elementer for at ændre rækkefølge\n• Tryk for hurtigt at se et elements kalender\n• Skift mellem Hjem og Arkiv-visninger</string>
+    
+    <!-- Week days (short) -->
+    <string name="monday_short">MAN</string>
+    <string name="tuesday_short">TIR</string>
+    <string name="wednesday_short">ONS</string>
+    <string name="thursday_short">TOR</string>
+    <string name="friday_short">FRE</string>
+    <string name="saturday_short">LØR</string>
+    <string name="sunday_short">SØN</string>
+    
+    <!-- Misc -->
+    <string name="notes_title">Noter - %1$s</string>
+    <string name="empty_drawer">Ingen elementer endnu</string>
+</resources>

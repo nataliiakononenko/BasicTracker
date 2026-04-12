@@ -1,33 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Tracker</string>
-    <string name="app_name_full">Tracker</string>
+    <!-- App name -->
+    <string name="app_name">Basic Tracker</string>
+    <string name="app_name_full">Basic Tracker</string>
+    
+    <!-- Navigation -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="home">Home</string>
+    <string name="archive">Archive</string>
     
+    <!-- Main view -->
     <string name="no_items_to_track">No items to track yet</string>
     <string name="add_item">Add item to track</string>
+    <string name="today">Today</string>
+    
+    <!-- Item management -->
     <string name="item_name">Item name</string>
     <string name="item_name_hint">e.g., Running, Migraine, Reading…</string>
-    
     <string name="sentiment_positive">Positive</string>
     <string name="sentiment_negative">Negative</string>
     <string name="sentiment_neutral">Neutral</string>
     
-    <string name="statistics">Statistics</string>
-    <string name="all_items">All Items</string>
-    
+    <!-- Actions -->
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="edit">Edit</string>
+    <string name="archive_action">Archive</string>
+    <string name="unarchive">Unarchive</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="unset_as_default">Unset as default</string>
     
-    <string name="today">Today</string>
-    <string name="this_week">This Week</string>
+    <!-- Dialogs -->
+    <string name="archive_item_title">Archive Item</string>
+    <string name="archive_item_message">Archive \"%1$s\"?\n\nYou can view archived items in the Archive section.</string>
+    <string name="delete_item_message">Delete \"%1$s\" and all its tracking data?\n\nConsider archiving instead to keep the data.</string>
+    <string name="item_archived">"%1$s" archived</string>
+    <string name="item_unarchived">"%1$s" unarchived</string>
+    <string name="item_deleted">Item deleted</string>
+    <string name="default_view_set">"%1$s" set as default view</string>
+    <string name="default_view_unset">Default view unset</string>
+    
+    <!-- Notes -->
+    <string name="notes">Notes</string>
+    <string name="no_notes_yet">No notes yet</string>
+    <string name="no_notes_instruction">Long-press on a day or tap \'+\' to add a note.</string>
+    <string name="no_notes_long_press">Long-press on a day to add a note</string>
+    <string name="note_for_date">Note for %1$s</string>
+    
+    <!-- Statistics -->
+    <string name="statistics">Statistics</string>
+    <string name="statistics_title">Statistics - %1$s</string>
+    <string name="no_statistics_data">No data yet</string>
+    <string name="start_tracking">Start tracking to see statistics</string>
+    <string name="no_items_for_statistics">No items to show statistics for</string>
+    <string name="monthly_overview">Monthly Overview</string>
     <string name="this_month">This Month</string>
-    <string name="all_time">All Time</string>
+    <string name="total">Total</string>
+    <string name="avg_week_this_month">Avg/Week (This Month)</string>
+    <string name="avg_week_overall">Avg/Week (Overall)</string>
+    <string name="current_streak">Current Streak</string>
+    <string name="longest_streak">Longest Streak</string>
+    <string name="times_format">%1$d times</string>
+    <string name="days_format">%1$d days</string>
+    <string name="last_30_days_total">Last 30 days: %1$d  •  Total: %2$d</string>
     
-    <string name="occurrences">occurrences</string>
-    <string name="streak">Current streak</string>
-    <string name="days">days</string>
+    <!-- Drawer menu -->
+    <string name="tips">Tips</string>
+    <string name="report_bug">Report a bug</string>
+    <string name="get_organized">Get Organized!</string>
+    <string name="no_email_app">No email app found</string>
+    
+    <!-- Tips dialog -->
+    <string name="tips_title">How to Use Basic Tracker</string>
+    <string name="tips_got_it">Got it!</string>
+    <string name="tips_content">📋 Getting Started\n• Tap \'+\' to create your first tracking item\n• Choose a name and sentiment (positive/negative/neutral)\n\n✓ Tracking Items\n• Tap the checkbox to mark an item as done for today\n• Long-press a day on the calendar to mark multiple items\n• Tap an item name to view its detailed calendar\n\n📅 Calendar View\n• Green frame shows the selected day\n• Dots under dates show which items were tracked\n• \'+X\' indicates additional tracked items\n\n📝 Notes\n• Long-press a day or tap \'+\' to add notes\n• Notes appear in the detailed item view\n\n🗂️ Managing Items\n• Tap the 3-dot menu on an item to:\n  - Edit name/sentiment\n  - Set as default view\n  - Archive (to hide without deleting)\n  - Delete permanently\n\n📦 Archive\n• Access archived items from the drawer menu\n• View past data without cluttering your main view\n• Unarchive items to restore them\n\n⚙️ Drawer Menu\n• Drag items to reorder\n• Tap to quickly view an item\'s calendar\n• Switch between Home and Archive views</string>
+    
+    <!-- Week days (short) -->
+    <string name="monday_short">MON</string>
+    <string name="tuesday_short">TUE</string>
+    <string name="wednesday_short">WED</string>
+    <string name="thursday_short">THU</string>
+    <string name="friday_short">FRI</string>
+    <string name="saturday_short">SAT</string>
+    <string name="sunday_short">SUN</string>
+    
+    <!-- Misc -->
+    <string name="notes_title">Notes - %1$s</string>
+    <string name="empty_drawer">No items yet</string>
 </resources>

@@ -54,7 +54,7 @@ class NotesActivity : AppCompatActivity(), NotesAdapter.OnNoteClickListener {
 
     private fun initializeViews() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.title = "Notes - $itemName"
+        toolbar.title = getString(R.string.notes_title, itemName)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.white))
 
@@ -109,7 +109,7 @@ class NotesActivity : AppCompatActivity(), NotesAdapter.OnNoteClickListener {
         val displayDate = dateFormat.format(calendar.time)
 
         val dialog = AlertDialog.Builder(this)
-            .setTitle("Note for $displayDate")
+            .setTitle(getString(R.string.note_for_date, displayDate))
             .setView(dialogView)
             .setPositiveButton(R.string.save) { _, _ ->
                 val noteText = etNote.text.toString().trim()

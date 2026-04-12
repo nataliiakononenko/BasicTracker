@@ -209,7 +209,7 @@ class StatisticsActivity : AppCompatActivity() {
             summaryName.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
 
             val summaryStats = TextView(this)
-            summaryStats.text = "Last 30 days: $count30Days  •  Total: $totalCount"
+            summaryStats.text = getString(R.string.last_30_days_total, count30Days, totalCount)
             summaryStats.textSize = 12f
             summaryStats.setTextColor(ContextCompat.getColor(this, R.color.text_secondary))
 

@@ -189,7 +189,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         navView.findViewById<View>(R.id.nav_archive).setOnClickListener {
             isArchiveView = true
             selectedItemId = null
-            supportActionBar?.title = "Archive"
+            supportActionBar?.title = getString(R.string.archive)
             drawerFab.visibility = View.GONE
             invalidateOptionsMenu()
             loadData()
@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             try {
                 startActivity(intent)
             } catch (e: Exception) {
-                Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.no_email_app), Toast.LENGTH_SHORT).show()
             }
             drawerLayout.closeDrawer(GravityCompat.START)
         }
@@ -276,7 +276,15 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
     private fun setupWeekDayHeaders() {
         weekHeader.removeAllViews()
-        val daysOfWeek = arrayOf("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
+        val daysOfWeek = arrayOf(
+            getString(R.string.monday_short),
+            getString(R.string.tuesday_short),
+            getString(R.string.wednesday_short),
+            getString(R.string.thursday_short),
+            getString(R.string.friday_short),
+            getString(R.string.saturday_short),
+            getString(R.string.sunday_short)
+        )
 
         for (day in daysOfWeek) {
             val textView = TextView(this)
@@ -574,7 +582,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         val isToday = selectedDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                       selectedDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
         if (isToday) {
-            tvQuickAddHeader.text = "Today"
+            tvQuickAddHeader.text = getString(R.string.today)
         } else {
             val dateFormat = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
             tvQuickAddHeader.text = dateFormat.format(selectedDate.time)
@@ -880,7 +888,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             database.getActiveTrackingItems()
         }
         if (items.isEmpty()) {
-            Toast.makeText(this, "No items to show statistics for", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_items_for_statistics), Toast.LENGTH_SHORT).show()
             return
         }
         val intent = Intent(this, StatisticsActivity::class.java)
@@ -899,47 +907,10 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     }
 
     private fun showTipsDialog() {
-        val tipsMessage = """
-            📋 Getting Started
-            • Tap '+' to create your first tracking item
-            • Choose a name and sentiment (positive/negative/neutral)
-            
-            ✓ Tracking Items
-            • Tap the checkbox to mark an item as done for today
-            • Long-press a day on the calendar to mark multiple items
-            • Tap an item name to view its detailed calendar
-            
-            📅 Calendar View
-            • Green frame shows the selected day
-            • Dots under dates show which items were tracked
-            • '+X' indicates additional tracked items
-            
-            📝 Notes
-            • Long-press a day or tap '+' to add notes
-            • Notes appear in the detailed item view
-            
-            🗂️ Managing Items
-            • Tap the 3-dot menu on an item to:
-              - Edit name/sentiment
-              - Set as default view
-              - Archive (to hide without deleting)
-              - Delete permanently
-            
-            📦 Archive
-            • Access archived items from the drawer menu
-            • View past data without cluttering your main view
-            • Unarchive items to restore them
-            
-            ⚙️ Drawer Menu
-            • Drag items to reorder
-            • Tap to quickly view an item's calendar
-            • Switch between Home and Archive views
-        """.trimIndent()
-        
         AlertDialog.Builder(this)
-            .setTitle("How to Use Basic Tracker")
-            .setMessage(tipsMessage)
-            .setPositiveButton("Got it!") { dialog, _ -> dialog.dismiss() }
+            .setTitle(getString(R.string.tips_title))
+            .setMessage(getString(R.string.tips_content))
+            .setPositiveButton(getString(R.string.tips_got_it)) { dialog, _ -> dialog.dismiss() }
             .show()
     }
 
@@ -1010,7 +981,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private fun showItemOptionsDialog(item: TrackingItem) {
         if (item.archived) {
             // Archived items: unarchive and delete options
-            val options = arrayOf("Unarchive", getString(R.string.delete))
+            val options = arrayOf(getString(R.string.unarchive), getString(R.string.delete))
             AlertDialog.Builder(this)
                 .setTitle(item.name)
                 .setItems(options) { _, which ->
@@ -1023,8 +994,8 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
         } else {
             // Active items: edit, set default, archive, delete
             val isDefault = defaultItemId == item.id
-            val defaultOption = if (isDefault) "Unset as default" else "Set as default"
-            val options = arrayOf(getString(R.string.edit), defaultOption, "Archive", getString(R.string.delete))
+            val defaultOption = if (isDefault) getString(R.string.unset_as_default) else getString(R.string.set_as_default)
+            val options = arrayOf(getString(R.string.edit), defaultOption, getString(R.string.archive_action), getString(R.string.delete))
             
             AlertDialog.Builder(this)
                 .setTitle(item.name)
@@ -1042,9 +1013,9 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
 
     private fun archiveItem(item: TrackingItem) {
         AlertDialog.Builder(this)
-            .setTitle("Archive Item")
-            .setMessage("Archive \"${item.name}\"?\n\nYou can view archived items in the Archive section.")
-            .setPositiveButton("Archive") { _, _ ->
+            .setTitle(getString(R.string.archive_item_title))
+            .setMessage(getString(R.string.archive_item_message, item.name))
+            .setPositiveButton(getString(R.string.archive_action)) { _, _ ->
                 database.archiveItem(item.id)
                 if (selectedItemId == item.id) {
                     selectedItemId = null
@@ -1054,7 +1025,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                     defaultItemId = null
                     getSharedPreferences("BasicTrackerPrefs", MODE_PRIVATE).edit().remove("defaultItemId").apply()
                 }
-                Toast.makeText(this, "\"${item.name}\" archived", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.item_archived, item.name), Toast.LENGTH_SHORT).show()
                 invalidateOptionsMenu()
                 loadData()
             }
@@ -1068,7 +1039,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             selectedItemId = null
             supportActionBar?.title = ""
         }
-        Toast.makeText(this, "\"${item.name}\" unarchived", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.item_unarchived, item.name), Toast.LENGTH_SHORT).show()
         invalidateOptionsMenu()
         loadData()
     }
@@ -1079,12 +1050,12 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
             // Unset as default
             defaultItemId = null
             prefs.edit().remove("defaultItemId").apply()
-            Toast.makeText(this, "Default view unset", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.default_view_unset), Toast.LENGTH_SHORT).show()
         } else {
             // Set as default
             defaultItemId = item.id
             prefs.edit().putLong("defaultItemId", item.id).apply()
-            Toast.makeText(this, "\"${item.name}\" set as default view", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.default_view_set, item.name), Toast.LENGTH_SHORT).show()
         }
         drawerAdapter.setDefaultItemId(defaultItemId)
     }
@@ -1092,7 +1063,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
     private fun confirmDeleteItem(item: TrackingItem) {
         AlertDialog.Builder(this)
             .setTitle(R.string.delete)
-            .setMessage("Delete \"${item.name}\" and all its tracking data?\n\nConsider archiving instead to keep the data.")
+            .setMessage(getString(R.string.delete_item_message, item.name))
             .setPositiveButton(R.string.delete) { _, _ ->
                 database.deleteTrackingItem(item.id)
                 if (selectedItemId == item.id) {
@@ -1101,7 +1072,7 @@ class MainActivity : AppCompatActivity(), TrackingItemAdapter.OnItemInteractionL
                 }
                 invalidateOptionsMenu()
                 loadData()
-                Toast.makeText(this, "Item deleted", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.item_deleted), Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton(R.string.cancel, null)
             .show()

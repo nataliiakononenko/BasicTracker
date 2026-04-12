@@ -51,7 +51,7 @@ class ItemStatisticsActivity : AppCompatActivity() {
 
     private fun initializeViews() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar.title = "Statistics - $itemName"
+        toolbar.title = getString(R.string.statistics_title, itemName)
         toolbar.setNavigationOnClickListener { finish() }
         toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.white))
 
@@ -81,8 +81,8 @@ class ItemStatisticsActivity : AppCompatActivity() {
         val thisMonthCount = database.countOccurrencesForItemInRange(itemId, monthStart, monthEnd)
         val totalCount = database.countOccurrencesForItem(itemId)
 
-        tvStatsThisMonth.text = "$thisMonthCount times"
-        tvStatsTotal.text = "$totalCount times"
+        tvStatsThisMonth.text = getString(R.string.times_format, thisMonthCount)
+        tvStatsTotal.text = getString(R.string.times_format, totalCount)
 
         // Calculate weeks in current month
         calendar.set(year, month, 1)
@@ -168,8 +168,8 @@ class ItemStatisticsActivity : AppCompatActivity() {
             longestStreak = maxOf(longestStreak, tempStreak)
         }
 
-        tvStatsStreak.text = "$currentStreak days"
-        tvStatsLongestStreak.text = "$longestStreak days"
+        tvStatsStreak.text = getString(R.string.days_format, currentStreak)
+        tvStatsLongestStreak.text = getString(R.string.days_format, longestStreak)
 
         // Draw graph
         drawMonthlyGraph(item.sentiment)

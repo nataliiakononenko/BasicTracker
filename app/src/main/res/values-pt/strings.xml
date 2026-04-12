@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name -->
+    <string name="app_name">Basic Tracker</string>
+    <string name="app_name_full">Basic Tracker</string>
+    
+    <!-- Navigation -->
+    <string name="navigation_drawer_open">Abrir menu de navegação</string>
+    <string name="navigation_drawer_close">Fechar menu de navegação</string>
+    <string name="home">Início</string>
+    <string name="archive">Arquivo</string>
+    
+    <!-- Main view -->
+    <string name="no_items_to_track">Ainda não há itens para rastrear</string>
+    <string name="add_item">Adicionar item para rastrear</string>
+    <string name="today">Hoje</string>
+    
+    <!-- Item management -->
+    <string name="item_name">Nome do item</string>
+    <string name="item_name_hint">ex. Corrida, Enxaqueca, Leitura…</string>
+    <string name="sentiment_positive">Positivo</string>
+    <string name="sentiment_negative">Negativo</string>
+    <string name="sentiment_neutral">Neutro</string>
+    
+    <!-- Actions -->
+    <string name="delete">Excluir</string>
+    <string name="cancel">Cancelar</string>
+    <string name="save">Salvar</string>
+    <string name="edit">Editar</string>
+    <string name="archive_action">Arquivar</string>
+    <string name="unarchive">Desarquivar</string>
+    <string name="set_as_default">Definir como padrão</string>
+    <string name="unset_as_default">Remover padrão</string>
+    
+    <!-- Dialogs -->
+    <string name="archive_item_title">Arquivar item</string>
+    <string name="archive_item_message">Arquivar \"%1$s\"?\n\nVocê pode ver itens arquivados na seção Arquivo.</string>
+    <string name="delete_item_message">Excluir \"%1$s\" e todos os dados de rastreamento?\n\nConsidere arquivar para manter os dados.</string>
+    <string name="item_archived">\"%1$s\" arquivado</string>
+    <string name="item_unarchived">\"%1$s\" desarquivado</string>
+    <string name="item_deleted">Item excluído</string>
+    <string name="default_view_set">\"%1$s\" definido como visualização padrão</string>
+    <string name="default_view_unset">Visualização padrão removida</string>
+    
+    <!-- Notes -->
+    <string name="notes">Notas</string>
+    <string name="no_notes_yet">Ainda não há notas</string>
+    <string name="no_notes_instruction">Pressione longamente um dia ou toque em \'+\' para adicionar uma nota.</string>
+    <string name="no_notes_long_press">Pressione longamente um dia para adicionar uma nota</string>
+    <string name="note_for_date">Nota para %1$s</string>
+    
+    <!-- Statistics -->
+    <string name="statistics">Estatísticas</string>
+    <string name="statistics_title">Estatísticas - %1$s</string>
+    <string name="no_statistics_data">Ainda não há dados</string>
+    <string name="start_tracking">Comece a rastrear para ver estatísticas</string>
+    <string name="no_items_for_statistics">Não há itens para mostrar estatísticas</string>
+    <string name="monthly_overview">Visão geral mensal</string>
+    <string name="this_month">Este mês</string>
+    <string name="total">Total</string>
+    <string name="avg_week_this_month">Média/semana (este mês)</string>
+    <string name="avg_week_overall">Média/semana (geral)</string>
+    <string name="current_streak">Sequência atual</string>
+    <string name="longest_streak">Sequência mais longa</string>
+    <string name="times_format">%1$d vezes</string>
+    <string name="days_format">%1$d dias</string>
+    <string name="last_30_days_total">Últimos 30 dias: %1$d  •  Total: %2$d</string>
+    
+    <!-- Drawer menu -->
+    <string name="tips">Dicas</string>
+    <string name="report_bug">Relatar um erro</string>
+    <string name="get_organized">Organize-se!</string>
+    <string name="no_email_app">Nenhum aplicativo de e-mail encontrado</string>
+    
+    <!-- Tips dialog -->
+    <string name="tips_title">Como usar o Basic Tracker</string>
+    <string name="tips_got_it">Entendi!</string>
+    <string name="tips_content">📋 Primeiros passos\n• Toque em \'+\' para criar seu primeiro item de rastreamento\n• Escolha um nome e sentimento (positivo/negativo/neutro)\n\n✓ Itens de rastreamento\n• Toque na caixa de seleção para marcar um item como concluído hoje\n• Pressione longamente um dia no calendário para marcar vários itens\n• Toque no nome de um item para ver seu calendário detalhado\n\n📅 Visualização do calendário\n• A moldura verde mostra o dia selecionado\n• Pontos abaixo das datas mostram quais itens foram rastreados\n• \'+X\' indica itens rastreados adicionais\n\n📝 Notas\n• Pressione longamente um dia ou toque em \'+\' para adicionar notas\n• As notas aparecem na visualização detalhada do item\n\n🗂️ Gerenciar itens\n• Toque no menu de 3 pontos em um item para:\n  - Editar nome/sentimento\n  - Definir como visualização padrão\n  - Arquivar (ocultar sem excluir)\n  - Excluir permanentemente\n\n📦 Arquivo\n• Acesse itens arquivados no menu\n• Veja dados passados sem sobrecarregar sua visualização principal\n• Desarquive itens para restaurá-los\n\n⚙️ Menu\n• Arraste itens para reordenar\n• Toque para ver rapidamente o calendário de um item\n• Alterne entre visualizações Início e Arquivo</string>
+    
+    <!-- Week days (short) -->
+    <string name="monday_short">SEG</string>
+    <string name="tuesday_short">TER</string>
+    <string name="wednesday_short">QUA</string>
+    <string name="thursday_short">QUI</string>
+    <string name="friday_short">SEX</string>
+    <string name="saturday_short">SÁB</string>
+    <string name="sunday_short">DOM</string>
+    
+    <!-- Misc -->
+    <string name="notes_title">Notas - %1$s</string>
+    <string name="empty_drawer">Ainda não há itens</string>
+</resources>

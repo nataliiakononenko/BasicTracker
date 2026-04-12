@@ -45,7 +45,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No notes yet"
+                android:text="@string/no_notes_yet"
                 android:textSize="18sp"
                 android:textColor="@color/text_secondary" />
 
@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Long-press on a day to add a note"
+                android:text="@string/no_notes_long_press"
                 android:textSize="14sp"
                 android:textColor="@color/text_secondary" />
 
